@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import Lenis from "lenis";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { getMotionTier } from "@/lib/motion";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -13,6 +14,15 @@ export default function SmoothScrollProvider({
   children: React.ReactNode;
 }) {
   useEffect(() => {
+    const tier = getMotionTier();
+
+    // Respect user preference — no smooth scroll in reduced/lite
+    if (tier === "reduced" || tier === "lite") {
+      // Ensure ScrollTrigger still works with native scroll
+      ScrollTrigger.defaults({ scroller: window });
+      return;
+    }
+
     const lenis = new Lenis({
       duration: 1.4,
       easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
@@ -20,7 +30,6 @@ export default function SmoothScrollProvider({
       smoothWheel: true,
     });
 
-    // Integrate with GSAP ScrollTrigger
     lenis.on("scroll", ScrollTrigger.update);
 
     const ticker = gsap.ticker.add((time) => {
@@ -37,3 +46,5 @@ export default function SmoothScrollProvider({
 
   return <>{children}</>;
 }
+
+

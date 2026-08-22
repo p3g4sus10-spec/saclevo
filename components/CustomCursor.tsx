@@ -1,15 +1,29 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { getMotionTier } from "@/lib/motion";
 
 export default function CustomCursor() {
   const dotRef = useRef<HTMLDivElement>(null);
   const ringRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    const tier = getMotionTier();
+
+    // Don't render cursor on touch or reduced-motion
+    if (tier === "reduced" || tier === "lite") return;
+    if ("ontouchstart" in window) return;
+
+    const isFinePointer = window.matchMedia("(pointer: fine) and (hover: hover)").matches;
+    if (!isFinePointer) return;
+
     const dot = dotRef.current;
     const ring = ringRef.current;
     if (!dot || !ring) return;
+
+    document.body.classList.add("custom-cursor-enabled");
+    dot.style.display = "block";
+    ring.style.display = "block";
 
     let mouseX = 0;
     let mouseY = 0;
@@ -25,7 +39,6 @@ export default function CustomCursor() {
     };
 
     const loop = () => {
-      // Lerp ring position for lag effect
       ringX += (mouseX - ringX) * 0.12;
       ringY += (mouseY - ringY) * 0.12;
       ring.style.left = `${ringX}px`;
@@ -38,22 +51,13 @@ export default function CustomCursor() {
 
     document.addEventListener("mousemove", onMove);
 
-    // Attach hover to interactive elements
-    const interactives = document.querySelectorAll(
-      "a, button, [data-cursor-hover]"
-    );
+    const interactives = document.querySelectorAll("a, button, [data-cursor-hover]");
     interactives.forEach((el) => {
       el.addEventListener("mouseenter", onEnter);
       el.addEventListener("mouseleave", onLeave);
     });
 
     animId = requestAnimationFrame(loop);
-
-    // Hide on touch devices
-    if ("ontouchstart" in window) {
-      dot.style.display = "none";
-      ring.style.display = "none";
-    }
 
     return () => {
       document.removeEventListener("mousemove", onMove);
@@ -62,13 +66,16 @@ export default function CustomCursor() {
         el.removeEventListener("mouseleave", onLeave);
       });
       cancelAnimationFrame(animId);
+      document.body.classList.remove("custom-cursor-enabled");
     };
   }, []);
 
   return (
     <>
-      <div ref={dotRef} className="cursor-dot" aria-hidden="true" />
-      <div ref={ringRef} className="cursor-ring" aria-hidden="true" />
+      <div ref={dotRef} className="cursor-dot" aria-hidden="true" style={{ display: "none" }} />
+      <div ref={ringRef} className="cursor-ring" aria-hidden="true" style={{ display: "none" }} />
     </>
   );
 }
+
+

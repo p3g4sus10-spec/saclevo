@@ -1,86 +1,96 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect } from "react";
 import Navbar from "@/components/Navbar";
-import Preloader from "@/components/Preloader";
 import CustomCursor from "@/components/CustomCursor";
 import SmoothScrollProvider from "@/components/SmoothScrollProvider";
 import HeroSection from "@/components/HeroSection";
-import KineticText from "@/components/KineticText";
-import HorizontalServices from "@/components/HorizontalServices";
-import BentoGrid from "@/components/BentoGrid";
-import Manifesto from "@/components/Manifesto";
-import CalendlySection from "@/components/CalendlySection";
+import PerceptionGap from "@/components/PerceptionGap";
+import PhantomSystem from "@/components/PhantomSystem";
+import Phantom30 from "@/components/Phantom30";
+import Principles from "@/components/Principles";
+import SystemEvidence from "@/components/SystemEvidence";
+import Qualification from "@/components/Qualification";
+import FAQ from "@/components/FAQ";
+import DiagnosticSection from "@/components/DiagnosticSection";
 import Footer from "@/components/Footer";
+import SkipLink from "@/components/SkipLink";
+import { CALENDLY_URL } from "@/config/site";
+import { captureEntryUTMs, track } from "@/lib/analytics";
 
 export default function HomePage() {
-  const [preloaderDone, setPreloaderDone] = useState(false);
+  // Capture entry UTMs once on mount — must happen before any Calendly interaction
+  useEffect(() => {
+    captureEntryUTMs();
+    track("page_view");
+  }, []);
 
   return (
     <>
-      {/* Custom Cursor (desktop only) */}
+      {/* Skip link — keyboard accessibility */}
+      <SkipLink />
+
+      {/* Custom Cursor — desktop only, respects reduced-motion */}
       <CustomCursor />
 
-      {/* Preloader */}
-      {!preloaderDone && (
-        <Preloader onComplete={() => setPreloaderDone(true)} />
-      )}
-
-      {/* Main Content */}
-      <SmoothScrollProvider>
-        <div
+      {/* Floating CTA — always visible, tracks placement */}
+      <a
+        href={CALENDLY_URL}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="cta-float"
+        id="floating-cta"
+        aria-label="Agendar diagnóstico gratuito con SCALEVO"
+        onClick={() => track("floating_cta_click", { placement: "floating_cta" })}
+      >
+        <span
           style={{
-            opacity: preloaderDone ? 1 : 0,
-            transition: "opacity 0.5s ease",
+            display: "inline-block",
+            width: "6px",
+            height: "6px",
+            borderRadius: "50%",
+            background: "rgba(255,255,255,0.7)",
+            marginRight: "6px",
+            flexShrink: 0,
           }}
-        >
-          {/* Floating CTA */}
-          <a
-            href="https://calendly.com/scalevo-mx/30min?utm_source=g&utm_medium=social&utm_content=link_in_bio"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="cta-float"
-            id="floating-cta"
-            aria-label="Agendar sesión gratuita con SCALEVO"
-          >
-            <span
-              style={{
-                display: "inline-block",
-                width: "6px",
-                height: "6px",
-                borderRadius: "50%",
-                background: "rgba(255,255,255,0.7)",
-                marginRight: "6px",
-                flexShrink: 0,
-              }}
-            />
-            AGENDA GRATIS
-          </a>
+          aria-hidden="true"
+        />
+        AGENDA GRATIS
+      </a>
 
-          <Navbar />
+      <SmoothScrollProvider>
+        <Navbar />
 
-          <main id="main-content">
-            {/* 1. Hero — WebGL Particles → S shape */}
-            <HeroSection />
+        <main id="main-content">
+          {/* 01 · CINEMATIC HERO */}
+          <HeroSection />
 
-            {/* 2. Kinetic Typography Manifesto */}
-            <KineticText />
+          {/* 02 · THE PERCEPTION GAP */}
+          <PerceptionGap />
 
-            {/* 3. Horizontal Services Gallery */}
-            <HorizontalServices />
+          {/* 03 · PHANTOM SYSTEM */}
+          <PhantomSystem />
 
-            {/* 4. Manifesto / Philosophy */}
-            <Manifesto />
+          {/* 04 · PHANTOM 30 */}
+          <Phantom30 />
 
-            {/* 5. Evidence Bento Grid */}
-            <BentoGrid />
+          {/* 05 · SCALEVO PRINCIPLES (kinetic + philosophy) */}
+          <Principles />
 
-            {/* 6. Calendly — Agenda tu sesión */}
-            <CalendlySection />
-          </main>
+          {/* 06 · SYSTEM EVIDENCE */}
+          <SystemEvidence />
 
-          <Footer />
-        </div>
+          {/* 07 · WHO IT IS / IS NOT FOR */}
+          <Qualification />
+
+          {/* 08 · FAQ */}
+          <FAQ />
+
+          {/* 09 · DIAGNOSTIC / CALENDLY */}
+          <DiagnosticSection />
+        </main>
+
+        <Footer />
       </SmoothScrollProvider>
     </>
   );

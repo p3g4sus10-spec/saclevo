@@ -2,7 +2,7 @@ import type { NextConfig } from "next";
 
 const ContentSecurityPolicy = `
   default-src 'self';
-  script-src 'self' 'unsafe-eval' 'unsafe-inline'
+  script-src 'self' 'unsafe-inline'
     https://fonts.googleapis.com
     https://assets.calendly.com;
   style-src 'self' 'unsafe-inline'
@@ -10,10 +10,9 @@ const ContentSecurityPolicy = `
     https://assets.calendly.com;
   font-src 'self'
     https://fonts.gstatic.com;
-  img-src 'self' data: blob: https:;
+  img-src 'self' data: blob:;
   media-src 'self' blob: data:;
   connect-src 'self'
-    https://api.scalevo.com
     https://calendly.com
     https://assets.calendly.com;
   frame-src
@@ -31,7 +30,7 @@ const securityHeaders = [
   },
   {
     key: "Strict-Transport-Security",
-    value: "max-age=63072000; includeSubDomains; preload",
+    value: "max-age=63072000", // preload and includeSubDomains removed temporarily until domain is definitive
   },
   {
     key: "X-Frame-Options",
@@ -71,12 +70,7 @@ const nextConfig: NextConfig = {
     },
   ],
   images: {
-    remotePatterns: [
-      {
-        protocol: "https",
-        hostname: "**",
-      },
-    ],
+    remotePatterns: [],
   },
 };
 
