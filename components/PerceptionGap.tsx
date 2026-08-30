@@ -5,11 +5,13 @@ import { gsap }
 from "gsap";
 import { getMotionTier } from "@/lib/motion";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { useSectionView } from "@/lib/useSectionView";
 
 gsap.registerPlugin(ScrollTrigger);
 
 export default function PerceptionGap() {
   const sectionRef = useRef<HTMLElement>(null);
+  useSectionView(sectionRef, "perception_gap");
 
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -66,7 +68,7 @@ export default function PerceptionGap() {
       aria-label="La brecha de percepción"
     >
       <div className="perception-inner">
-        <p className="section-label">// LA BRECHA</p>
+        <p className="section-label">// CUANDO LA PERCEPCIÓN SE QUEDA CORTA</p>
 
         <h2 className="section-title pg-headline">
           Tu negocio puede ser mejor
@@ -78,17 +80,17 @@ export default function PerceptionGap() {
           {/* Reality column */}
           <div className="pg-col pg-col-reality">
             <div className="pg-col-marker">
-              <span className="pg-col-label">REALIDAD</span>
+              <span className="pg-col-label">LO QUE YA EXISTE</span>
               <div className="pg-col-bar pg-col-bar-full">
                 <div className="pg-col-bar-fill" />
                 <span className="pg-col-bar-text">Tu operación real</span>
               </div>
             </div>
             <ul className="pg-list" aria-label="Características del negocio real">
-              <li>Gran producto o servicio</li>
-              <li>Buena experiencia real</li>
-              <li>Capacidad de entrega</li>
-              <li>Ticket premium justificado</li>
+              <li>Una oferta valiosa</li>
+              <li>Clientes bien atendidos</li>
+              <li>Capacidad real para cumplir</li>
+              <li>Un precio respaldado por lo que entregas</li>
             </ul>
           </div>
 
@@ -102,17 +104,17 @@ export default function PerceptionGap() {
           {/* Perception column */}
           <div className="pg-col pg-col-perception">
             <div className="pg-col-marker">
-              <span className="pg-col-label" style={{ color: "var(--text-muted)" }}>PERCEPCIÓN DIGITAL</span>
+              <span className="pg-col-label" style={{ color: "var(--text-muted)" }}>LO QUE LA GENTE VE</span>
               <div className="pg-col-bar pg-col-bar-partial">
                 <div className="pg-col-bar-fill pg-col-bar-fill-partial" />
                 <span className="pg-col-bar-text" style={{ color: "var(--text-muted)" }}>Lo que el mercado ve</span>
               </div>
             </div>
             <ul className="pg-list pg-list-muted" aria-label="Problemas de percepción digital">
-              <li>Comunicación que no refleja el nivel</li>
-              <li>Poca diferenciación visible</li>
-              <li>Sin ruta clara hacia la conversación</li>
-              <li>Autoridad que no se transmite</li>
+              <li>Un mensaje difícil de entender</li>
+              <li>Contenido que no muestra la diferencia</li>
+              <li>Pocas razones visibles para elegirte</li>
+              <li>Ningún siguiente paso claro</li>
             </ul>
           </div>
         </div>
@@ -120,9 +122,9 @@ export default function PerceptionGap() {
         <div className="pg-close">
           <div className="pg-close-divider" aria-hidden="true" />
           <p className="pg-close-text">
-            El problema no siempre es lo que vendes.
+            Si tu valor no se entiende rápido, una buena oportunidad puede irse
             <br />
-            A veces es <em>lo que el mercado percibe.</em>
+            <em>antes de preguntar.</em>
           </p>
         </div>
       </div>

@@ -4,12 +4,14 @@ import { useEffect, useRef } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { PHANTOM_SYSTEM_STAGES } from "@/config/offers";
+import { useSectionView } from "@/lib/useSectionView";
 import { getMotionTier } from "@/lib/motion";
 
 gsap.registerPlugin(ScrollTrigger);
 
 export default function PhantomSystem() {
   const sectionRef = useRef<HTMLElement>(null);
+  useSectionView(sectionRef, "phantom_system");
 
   useEffect(() => {
     const tier = getMotionTier();
@@ -64,13 +66,15 @@ export default function PhantomSystem() {
         <div className="phantom-system-header">
           <p className="section-label">// PHANTOM SYSTEM</p>
           <h2 className="section-title">
-            Un sistema,
+            No hacemos contenido por hacerlo.
             <br />
-            <span style={{ color: "var(--text-muted)" }}>no servicios sueltos.</span>
+            <span style={{ color: "var(--text-muted)" }}>
+              Construimos el camino completo.
+            </span>
           </h2>
           <p className="phantom-system-sub">
-            Cada etapa tiene una función dentro del recorrido.
-            Ningún activo existe por sí solo.
+            PHANTOM alinea lo que dices, lo que muestras y el siguiente paso que
+            puede dar una persona interesada.
           </p>
         </div>
 

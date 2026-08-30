@@ -1,5 +1,8 @@
+"use client";
+
 import Link from "next/link";
 import { SOCIAL, SITE, NAV_LINKS } from "@/config/site";
+import { track } from "@/lib/analytics";
 
 const InstagramIcon = () => (
   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
@@ -16,8 +19,6 @@ const TikTokIcon = () => (
 );
 
 export default function Footer() {
-  const year = new Date().getFullYear();
-
   return (
     <footer className="footer" role="contentinfo">
       {/* Social strip */}
@@ -51,6 +52,13 @@ export default function Footer() {
               role="listitem"
               className="social-card"
               style={{ "--social-color": s.color, "--social-gradient": s.gradient } as React.CSSProperties}
+              onClick={() =>
+                track("social_click", {
+                  platform: s.id,
+                  placement: "footer",
+                  destination_type: "social",
+                })
+              }
             >
               <span className="social-card-glow" aria-hidden="true" />
               <span className="social-card-icon">{s.icon}</span>
@@ -77,19 +85,13 @@ export default function Footer() {
               {link.label}
             </Link>
           ))}
-          <Link href="/privacidad" className="footer-link">
-            Privacidad
-          </Link>
-          <Link href={`mailto:${SITE.email}`} className="footer-link">
-            {SITE.email}
-          </Link>
         </nav>
       </div>
 
       {/* Footer bottom */}
       <div className="footer-bottom">
         <p className="footer-copy">
-          © {year} SCALEVO. Todos los derechos reservados.
+          SCALEVO · {SITE.tagline}
         </p>
         <p className="footer-copy" style={{ color: "var(--text-subtle)", fontSize: "10px" }}>
           Diseñado para durar.

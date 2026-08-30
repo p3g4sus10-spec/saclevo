@@ -1,74 +1,51 @@
 import type { NextConfig } from "next";
+import { RUNTIME_GATES } from "./config/gates";
 
-const ContentSecurityPolicy = `
-  default-src 'self';
-  script-src 'self' 'unsafe-inline'
-    https://fonts.googleapis.com
-    https://assets.calendly.com;
-  style-src 'self' 'unsafe-inline'
-    https://fonts.googleapis.com
-    https://assets.calendly.com;
-  font-src 'self'
-    https://fonts.gstatic.com;
-  img-src 'self' data: blob:;
-  media-src 'self' blob: data:;
-  connect-src 'self'
-    https://calendly.com
-    https://assets.calendly.com;
-  frame-src
-    https://calendly.com;
-  worker-src 'self' blob:;
-  frame-ancestors 'none';
-  base-uri 'self';
-  form-action 'self' https://calendly.com;
-`;
+const devEval = process.env.NODE_ENV === "production" ? "" : " 'unsafe-eval'";
+const calendlyEnabled = RUNTIME_GATES.calendly.enabled;
+const contentSecurityPolicy = [
+  "default-src 'self'",
+  `script-src 'self' 'unsafe-inline'${devEval}${calendlyEnabled ? " https://assets.calendly.com" : ""}`,
+  `style-src 'self' 'unsafe-inline'${calendlyEnabled ? " https://assets.calendly.com" : ""}`,
+  "font-src 'self' data:",
+  "img-src 'self' data: blob:",
+  "media-src 'self' blob: data:",
+  `connect-src 'self'${calendlyEnabled ? " https://calendly.com https://assets.calendly.com" : ""}`,
+  calendlyEnabled ? "frame-src https://calendly.com" : "frame-src 'none'",
+  "worker-src 'self' blob:",
+  "object-src 'none'",
+  "frame-ancestors 'none'",
+  "base-uri 'self'",
+  `form-action 'self'${calendlyEnabled ? " https://calendly.com" : ""}`,
+].join("; ");
 
 const securityHeaders = [
-  {
-    key: "X-DNS-Prefetch-Control",
-    value: "on",
-  },
-  {
-    key: "Strict-Transport-Security",
-    value: "max-age=63072000", // preload and includeSubDomains removed temporarily until domain is definitive
-  },
-  {
-    key: "X-Frame-Options",
-    value: "DENY",
-  },
-  {
-    key: "X-Content-Type-Options",
-    value: "nosniff",
-  },
-  {
-    key: "X-XSS-Protection",
-    value: "1; mode=block",
-  },
-  {
-    key: "Referrer-Policy",
-    value: "strict-origin-when-cross-origin",
-  },
+  { key: "X-DNS-Prefetch-Control", value: "on" },
+  { key: "Strict-Transport-Security", value: "max-age=63072000" },
+  { key: "X-Frame-Options", value: "DENY" },
+  { key: "X-Content-Type-Options", value: "nosniff" },
+  { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
   {
     key: "Permissions-Policy",
     value:
       "camera=(), microphone=(), geolocation=(), browsing-topics=(), gyroscope=(self)",
   },
-  {
-    key: "Content-Security-Policy",
-    value: ContentSecurityPolicy.replace(/\s{2,}/g, " ").trim(),
-  },
+  { key: "Content-Security-Policy", value: contentSecurityPolicy },
 ];
 
 const nextConfig: NextConfig = {
-  experimental: {
-    // Use webpack for CSS processing (Turbopack + Tailwind v4 PostCSS compatibility)
+  env: {
+    NEXT_PUBLIC_RELEASE_SHA:
+      process.env.VERCEL_GIT_COMMIT_SHA ?? process.env.GITHUB_SHA ?? "local",
   },
-  headers: async () => [
-    {
-      source: "/(.*)",
-      headers: securityHeaders,
-    },
-  ],
+  async headers() {
+    return [
+      {
+        source: "/(.*)",
+        headers: securityHeaders,
+      },
+    ];
+  },
   images: {
     remotePatterns: [],
   },

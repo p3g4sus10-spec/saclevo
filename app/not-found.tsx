@@ -23,7 +23,7 @@ export default function NotFound() {
           margin: 0,
           lineHeight: 1,
           letterSpacing: "-0.04em",
-          color: "var(--brand-blue)",
+          color: "var(--brand-blue-text)",
         }}
       >
         404
@@ -55,7 +55,7 @@ export default function NotFound() {
           fontSize: "12px",
           letterSpacing: "0.2em",
           textTransform: "uppercase",
-          color: "var(--brand-blue)",
+          color: "var(--brand-blue-text)",
           borderBottom: "1px solid var(--brand-blue)",
           paddingBottom: "8px",
           textDecoration: "none",

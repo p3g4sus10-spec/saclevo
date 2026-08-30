@@ -4,41 +4,43 @@ import { useEffect, useRef } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { getMotionTier } from "@/lib/motion";
+import { useSectionView } from "@/lib/useSectionView";
 
 gsap.registerPlugin(ScrollTrigger);
 
 const principles = [
   {
     num: "01",
-    title: "EVIDENCIA SOBRE OPINIÓN.",
-    text: "No optimizamos por lo que «se siente». Observamos, probamos y medimos.",
+    title: "MIRAR ANTES DE SUPONER.",
+    text: "Primero entendemos qué está pasando. Después decidimos qué cambiar.",
   },
   {
     num: "02",
-    title: "SISTEMA SOBRE IMPROVISACIÓN.",
-    text: "Cada activo debe tener una función dentro del recorrido. Nada existe por azar.",
+    title: "CADA PIEZA TIENE UN PROPÓSITO.",
+    text: "Nada se publica solo para llenar un calendario.",
   },
   {
     num: "03",
-    title: "CLARIDAD SOBRE VOLUMEN.",
-    text: "Más contenido no corrige una propuesta que nadie entiende.",
+    title: "CLARIDAD ANTES QUE CANTIDAD.",
+    text: "Más contenido no ayuda si tu oferta sigue siendo difícil de entender.",
   },
   {
     num: "04",
-    title: "ITERACIÓN SOBRE EGO.",
-    text: "Si el mercado contradice una hipótesis, cambiamos la hipótesis.",
+    title: "MEJORAR SIN AFERRARNOS.",
+    text: "Si la respuesta del mercado contradice una idea, ajustamos la idea.",
   },
 ];
 
 const phrases = [
-  { text: "NO VENDEMOS PIEZAS SUELTAS.", filled: false },
-  { text: "CONSTRUIMOS SISTEMAS.", filled: false },
+  { text: "NO HACEMOS CONTENIDO POR HACERLO.", filled: false },
+  { text: "CADA PIEZA TIENE UN PROPÓSITO.", filled: false },
   { text: "NO ES SUERTE. ES SISTEMA.", filled: true },
 ];
 
 export default function Principles() {
   const sectionRef = useRef<HTMLElement>(null);
   const kineticRef = useRef<HTMLElement>(null);
+  useSectionView(sectionRef, "principles");
 
   useEffect(() => {
     const tier = getMotionTier();
@@ -46,11 +48,15 @@ export default function Principles() {
 
     // Kinetic text
     const kineticCtx = gsap.context(() => {
-      if (getMotionTier() === 'reduced') return;
       const words = gsap.utils.toArray<HTMLElement>(".kinetic-word");
 
+      if (tier === "reduced") {
+        gsap.set(words, { opacity: 1, x: 0 });
+        return;
+      }
+
       if (!usePins) {
-        // Simple fade-in for lite/reduced
+        // Simple fade-in for the lite tier.
         gsap.fromTo(
           words,
           { opacity: 0 },
@@ -89,7 +95,14 @@ export default function Principles() {
 
     // Manifesto pillars
     const pillarsCtx = gsap.context(() => {
-      if (getMotionTier() === 'reduced') return;
+      if (tier === "reduced") {
+        gsap.set([".principle-pillar", ".principles-big-text"], {
+          opacity: 1,
+          x: 0,
+          y: 0,
+        });
+        return;
+      }
       gsap.fromTo(
         ".principle-pillar",
         { opacity: 0, x: 30 },
@@ -145,18 +158,18 @@ export default function Principles() {
       <section
         ref={sectionRef}
         className="principles-section"
-        id="method"
+        id="principles"
         aria-label="Principios SCALEVO"
       >
         <div className="principles-grid">
           <div>
-            <p className="section-label">// NUESTRA FILOSOFÍA</p>
+            <p className="section-label">// CÓMO TRABAJAMOS</p>
             <h2 className="principles-big-text">
-              NO BUSCAMOS
+              MENOS
               <br />
-              VOLUMEN.
+              RUIDO.
               <br />
-              <em>BUSCAMOS FIT.</em>
+              <em>MÁS CLARIDAD.</em>
             </h2>
           </div>
 

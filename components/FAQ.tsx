@@ -7,12 +7,14 @@ import { getMotionTier } from "@/lib/motion";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { FAQ_ITEMS } from "@/config/faq";
 import { track } from "@/lib/analytics";
+import { useSectionView } from "@/lib/useSectionView";
 
 gsap.registerPlugin(ScrollTrigger);
 
 export default function FAQ() {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
   const sectionRef = useRef<HTMLElement>(null);
+  useSectionView(sectionRef, "faq");
 
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -42,7 +44,7 @@ export default function FAQ() {
     const newOpen = openIndex === i ? null : i;
     setOpenIndex(newOpen);
     if (newOpen !== null) {
-      track("faq_open", { faq_question: FAQ_ITEMS[i].q });
+      track("faq_open", { faq_id: FAQ_ITEMS[i].id });
     }
   };
 
@@ -66,11 +68,11 @@ export default function FAQ() {
         <dl className="faq-list" role="list">
           {FAQ_ITEMS.map((item, i) => {
             const isOpen = openIndex === i;
-            const answerId = `faq-answer-${i}`;
-            const questionId = `faq-question-${i}`;
+            const answerId = `faq-answer-${item.id}`;
+            const questionId = `faq-question-${item.id}`;
 
             return (
-              <div key={i} className={`faq-item ${isOpen ? "faq-item-open" : ""}`} role="listitem">
+              <div key={item.id} className={`faq-item ${isOpen ? "faq-item-open" : ""}`} role="listitem">
                 <dt>
                   <button
                     id={questionId}

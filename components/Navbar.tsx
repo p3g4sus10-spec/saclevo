@@ -2,8 +2,9 @@
 
 import { useEffect, useRef, useState, useCallback } from "react";
 import Link from "next/link";
-import { NAV_LINKS, SOCIAL, CALENDLY_URL } from "@/config/site";
+import { NAV_LINKS, SOCIAL, CTA_LABELS } from "@/config/site";
 import { track } from "@/lib/analytics";
+import BookingLink from "@/components/BookingLink";
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
@@ -20,6 +21,13 @@ export default function Navbar() {
   // Close menu on Escape key + focus trap
   useEffect(() => {
     if (!menuOpen) return;
+
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    const handleResize = () => {
+      if (window.innerWidth > 768) setMenuOpen(false);
+    };
 
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
@@ -45,20 +53,21 @@ export default function Navbar() {
     };
 
     document.addEventListener("keydown", handleKeyDown);
+    window.addEventListener("resize", handleResize);
     // Move focus into menu on open
     menuRef.current?.querySelector<HTMLElement>("a, button")?.focus();
 
-    return () => document.removeEventListener("keydown", handleKeyDown);
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+      window.removeEventListener("resize", handleResize);
+      document.body.style.overflow = previousOverflow;
+    };
   }, [menuOpen]);
 
   const closeMenu = useCallback(() => {
     setMenuOpen(false);
     toggleRef.current?.focus();
   }, []);
-
-  const handleNavCTA = () => {
-    track("nav_cta_click", { placement: "navbar" }); track("calendly_open", { placement: "navbar" });
-  };
 
   return (
     <>
@@ -94,7 +103,13 @@ export default function Navbar() {
               aria-label={SOCIAL.instagram.label}
               className="nav-social-link"
               role="listitem"
-              onClick={() => track("instagram_click", { placement: "navbar" })}
+              onClick={() =>
+                track("social_click", {
+                  platform: "instagram",
+                  placement: "navbar",
+                  destination_type: "social",
+                })
+              }
             >
               IG
             </a>
@@ -106,22 +121,26 @@ export default function Navbar() {
               aria-label={SOCIAL.tiktok.label}
               className="nav-social-link"
               role="listitem"
-              onClick={() => track("tiktok_click", { placement: "navbar" })}
+              onClick={() =>
+                track("social_click", {
+                  platform: "tiktok",
+                  placement: "navbar",
+                  destination_type: "social",
+                })
+              }
             >
               TK
             </a>
           </div>
 
-          <a
-            href={CALENDLY_URL}
-            target="_blank"
-            rel="noopener noreferrer"
+          <BookingLink
+            placement="navbar"
+            ctaId="navbar_primary"
             className="nav-cta btn-neon-sm"
             id="nav-cta-btn"
-            onClick={handleNavCTA}
           >
-            Agendar →
-          </a>
+            {CTA_LABELS.primary}
+          </BookingLink>
         </div>
 
         {/* Mobile Menu Button */}
@@ -170,7 +189,11 @@ export default function Navbar() {
             className="mobile-menu-social-link"
             aria-label={SOCIAL.instagram.label}
             onClick={() => {
-              track("instagram_click", { placement: "mobile_menu" });
+              track("social_click", {
+                platform: "instagram",
+                placement: "mobile_menu",
+                destination_type: "social",
+              });
               closeMenu();
             }}
           >
@@ -183,7 +206,11 @@ export default function Navbar() {
             className="mobile-menu-social-link"
             aria-label={SOCIAL.tiktok.label}
             onClick={() => {
-              track("tiktok_click", { placement: "mobile_menu" });
+              track("social_click", {
+                platform: "tiktok",
+                placement: "mobile_menu",
+                destination_type: "social",
+              });
               closeMenu();
             }}
           >
@@ -191,21 +218,17 @@ export default function Navbar() {
           </a>
         </div>
 
-        <a
-          href={CALENDLY_URL}
-          target="_blank"
-          rel="noopener noreferrer"
+        <BookingLink
+          placement="mobile_menu"
+          ctaId="mobile_primary"
           className="btn-neon"
-          onClick={() => {
-            track("nav_cta_click", { placement: "mobile_menu" }); track("calendly_open", { placement: "mobile_menu" });
-            closeMenu();
-          }}
+          afterClick={closeMenu}
           style={{ marginTop: "16px", fontSize: "13px" }}
           id="mobile-calendly-cta"
         >
           <span className="btn-neon-dot" aria-hidden="true" />
-          Agendar Diagnóstico →
-        </a>
+          {CTA_LABELS.primary} →
+        </BookingLink>
       </div>
 
       {/* Overlay backdrop for mobile menu */}

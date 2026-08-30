@@ -6,13 +6,17 @@ from "gsap";
 import { getMotionTier } from "@/lib/motion";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { PHANTOM_30 } from "@/config/offers";
-import { CALENDLY_URL } from "@/config/site";
-import { track } from "@/lib/analytics";
+import { CTA_LABELS } from "@/config/site";
+import { useSectionView } from "@/lib/useSectionView";
+import BookingLink from "@/components/BookingLink";
 
 gsap.registerPlugin(ScrollTrigger);
 
 export default function Phantom30() {
   const sectionRef = useRef<HTMLElement>(null);
+  useSectionView(sectionRef, "phantom_30", {
+    route_interest: "phantom-30",
+  });
 
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -62,7 +66,7 @@ export default function Phantom30() {
       ref={sectionRef}
       className="phantom30-section"
       id="phantom-30"
-      aria-label="PHANTOM 30 — Founding Sprint"
+      aria-labelledby="phantom-30-heading"
     >
       {/* Background glow */}
       <div className="p30-bg-glow" aria-hidden="true" />
@@ -70,11 +74,16 @@ export default function Phantom30() {
       <div className="phantom30-inner">
         {/* Header */}
         <div className="p30-header">
-          <p className="section-label">// PHANTOM 30</p>
-          <h2 className="section-title">
+          <p className="section-label">
+            // {PHANTOM_30.name} · {PHANTOM_30.programLabel}
+          </p>
+          <h2 className="section-title" id="phantom-30-heading">
             {PHANTOM_30.headline}
           </h2>
-          <p className="p30-supporting">{PHANTOM_30.supporting}</p>
+          <p className="p30-supporting">{PHANTOM_30.valueStatement}</p>
+          <p className="p30-investment-context">
+            {PHANTOM_30.description}
+          </p>
         </div>
 
         {/* Two-column layout: timeline + deliverables */}
@@ -122,37 +131,48 @@ export default function Phantom30() {
             <div className="p30-price-item">
               <span className="p30-price-label">{PHANTOM_30.price.label}</span>
               <span className="p30-price-amount">
-                ${PHANTOM_30.price.total.toLocaleString("es-MX")}
+                ${PHANTOM_30.price.base.toLocaleString("es-MX")}
                 <span className="p30-price-currency"> {PHANTOM_30.price.currency}</span>
               </span>
             </div>
             <div className="p30-price-divider" aria-hidden="true" />
             <div className="p30-price-item">
-              <span className="p30-price-label">{PHANTOM_30.price.activationLabel}</span>
+              <span className="p30-price-label">
+                {PHANTOM_30.price.installmentLabel}
+              </span>
               <span className="p30-price-amount p30-price-activation">
-                ${PHANTOM_30.price.activation.toLocaleString("es-MX")}
+                ${PHANTOM_30.price.firstInstallment.toLocaleString("es-MX")}
                 <span className="p30-price-currency"> {PHANTOM_30.price.currency}</span>
               </span>
             </div>
+            <p className="p30-price-note">{PHANTOM_30.price.note}</p>
             <div className="p30-price-item">
               <span className="p30-price-label">DURACIÓN</span>
-              <span className="p30-price-amount p30-price-duration">30 días</span>
+              <span className="p30-price-amount p30-price-duration">
+                {PHANTOM_30.duration}
+              </span>
             </div>
           </div>
 
-          <a
-            href={CALENDLY_URL}
-            target="_blank"
-            rel="noopener noreferrer"
+          <p className="p30-founding-note">{PHANTOM_30.price.disclosure}</p>
+          <p className="p30-founding-note">{PHANTOM_30.durationCondition}</p>
+          <p className="claims-disclosure claims-disclosure-p30">
+            {PHANTOM_30.claimsDisclosure}
+          </p>
+
+          <BookingLink
+            placement="phantom_30"
+            ctaId="phantom_30_primary"
+            routeInterest="phantom-30"
             className="btn-neon p30-cta"
-            onClick={() => { track("phantom30_cta_click", { placement: "phantom30", cta_text: "APLICAR PARA PHANTOM 30" }); track("calendly_open", { placement: "phantom30" }); }}
+            id="phantom-30-cta"
           >
             <span className="btn-neon-dot" aria-hidden="true" />
-            AGENDAR DIAGNÓSTICO
+            {CTA_LABELS.primary}
             <span className="btn-neon-arrow" aria-hidden="true">→</span>
-          </a>
+          </BookingLink>
           <p className="p30-disclaimer">
-            Sin compromiso · Gratuito · 30 minutos
+            Diagnóstico de 30 minutos · Sin compromiso
           </p>
         </div>
       </div>

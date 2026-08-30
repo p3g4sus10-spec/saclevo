@@ -5,6 +5,7 @@ import { gsap }
 from "gsap";
 import { getMotionTier } from "@/lib/motion";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { useSectionView } from "@/lib/useSectionView";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -12,49 +13,50 @@ const evidenceCells = [
   {
     cls: "ev-1",
     type: "concept",
-    label: "DIAGNÓSTICO",
-    desc: "Detectamos dónde se pierde percepción o intención comercial antes de producir cualquier activo.",
-    tag: "PROCESO",
+    label: "ENTENDER EL PROBLEMA",
+    desc: "Encontramos dónde se pierde claridad, confianza o intención antes de producir.",
+    tag: "ENTENDER",
   },
   {
     cls: "ev-2",
     type: "concept",
-    label: "PROTOTIPO",
-    desc: "Antes de escalar una idea, la hacemos visible. Validamos la dirección antes de ejecutar a escala.",
-    tag: "MÉTODO",
+    label: "PROBAR LA DIRECCIÓN",
+    desc: "Hacemos visible la idea antes de escalarla, para detectar ajustes a tiempo.",
+    tag: "PROBAR",
   },
   {
     cls: "ev-3",
     type: "concept",
-    label: "FUNNEL",
-    desc: "Cada pieza de contenido o activo debe conducir a un siguiente paso concreto. Nada existe sin función.",
-    tag: "ARQUITECTURA",
+    label: "DAR UN SIGUIENTE PASO",
+    desc: "Cada pieza ayuda a la persona adecuada a saber qué hacer después.",
+    tag: "CONECTAR",
   },
   {
     cls: "ev-4",
     type: "concept",
-    label: "MEDICIÓN",
-    desc: "Hipótesis → ejecución → dato → decisión. No optimizamos lo que no medimos.",
-    tag: "ITERACIÓN",
+    label: "MEDIR LO POSIBLE",
+    desc: "Revisamos señales reales, aprendemos y ajustamos.",
+    tag: "APRENDER",
   },
   {
     cls: "ev-5",
     type: "principle",
-    label: "SISTEMA",
-    desc: "La diferencia entre presencia digital y posicionamiento real es la coherencia entre todos los puntos de contacto.",
-    tag: "PRINCIPIO",
+    label: "MANTENER COHERENCIA",
+    desc: "El mensaje, el contenido y la forma de contacto deben contar la misma historia.",
+    tag: "ALINEAR",
   },
   {
     cls: "ev-6",
     type: "principle",
-    label: "CONVERSIÓN",
-    desc: "Una audiencia sin ruta de conversión es solo vanidad métrica. Construimos el camino desde la atención hasta la conversación.",
-    tag: "OBJETIVO",
+    label: "LLEGAR A CONVERSACIÓN",
+    desc: "La atención solo importa si puede convertirse en interés claro y una conversación comercial.",
+    tag: "AVANZAR",
   },
 ];
 
 export default function SystemEvidence() {
   const sectionRef = useRef<HTMLElement>(null);
+  useSectionView(sectionRef, "method");
 
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -77,15 +79,17 @@ export default function SystemEvidence() {
     <section
       ref={sectionRef}
       className="evidence-section"
-      id="evidence"
+      id="method"
       aria-label="Cómo pensamos — System Evidence"
     >
       <div className="section-header">
-        <p className="section-label">// CÓMO PENSAMOS</p>
+        <p className="section-label">// ASÍ CONVERTIMOS CLARIDAD EN ACCIÓN</p>
         <h2 className="section-title">
-          El sistema en acción.
+          De una buena oferta
           <br />
-          <span style={{ color: "var(--text-muted)" }}>No publicaciones. Arquitectura.</span>
+          <span style={{ color: "var(--text-muted)" }}>
+            a una conversación más fácil.
+          </span>
         </h2>
       </div>
 
@@ -99,7 +103,7 @@ export default function SystemEvidence() {
                 fontFamily: "var(--font-mono)",
                 fontSize: "9px",
                 letterSpacing: "0.2em",
-                color: "var(--brand-blue)",
+                color: "var(--brand-blue-text)",
                 marginBottom: "16px",
                 textTransform: "uppercase",
               }}

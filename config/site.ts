@@ -1,39 +1,69 @@
+import { RUNTIME_GATES } from "@/config/gates";
+
+export const DEFAULT_SITE_URL = "https://scalevo-mx.vercel.app";
+
 /**
- * Resolve the dynamic production URL.
- * 1. NEXT_PUBLIC_SITE_URL (Custom Domain)
- * 2. VERCEL_PROJECT_PRODUCTION_URL (Vercel Production)
- * 3. localhost (Development)
+ * Normalize the single canonical origin used by metadata, JSON-LD, robots and
+ * sitemap. Invalid or non-HTTPS values fail loudly during build/configuration.
  */
-export const getSiteUrl = () => {
-  if (process.env.NEXT_PUBLIC_SITE_URL) {
-    return process.env.NEXT_PUBLIC_SITE_URL;
+export function normalizeSiteUrl(value = DEFAULT_SITE_URL): string {
+  let url: URL;
+
+  try {
+    url = new URL(value);
+  } catch {
+    throw new Error(`Invalid SITE_URL: ${value}`);
   }
-  if (process.env.VERCEL_PROJECT_PRODUCTION_URL) {
-    return `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`;
+
+  if (url.protocol !== "https:") {
+    throw new Error(`SITE_URL must use HTTPS: ${value}`);
   }
-  // No VERCEL_URL fallback para evitar canonicals contaminados en previews
-  return "http://localhost:3000";
-};
+
+  if (url.username || url.password || url.search || url.hash || url.pathname !== "/") {
+    throw new Error(`SITE_URL must be an origin without path, query or credentials: ${value}`);
+  }
+
+  return url.origin;
+}
+
+export function getSiteUrl(): string {
+  return normalizeSiteUrl(
+    process.env.NEXT_PUBLIC_SITE_URL ?? process.env.SITE_URL ?? DEFAULT_SITE_URL,
+  );
+}
+
+export const SITE_URL = getSiteUrl();
+
+export function absoluteUrl(path = "/"): string {
+  return new URL(path, `${SITE_URL}/`).toString();
+}
+
+export function isIndexableEnvironment(): boolean {
+  return (
+    RUNTIME_GATES.publicDomain.approved &&
+    RUNTIME_GATES.publication.productionAuthorized &&
+    process.env.VERCEL_ENV === "production"
+  );
+}
 
 export const SITE = {
   name: "SCALEVO",
   tagline: "No es suerte. Es sistema.",
-  url: getSiteUrl(),
+  url: SITE_URL,
   locale: "es_MX",
-  email: "scalevo.mx@gmail.com",
-
+  language: "es-MX",
   title: "SCALEVO — No es suerte. Es sistema.",
   description:
-    "Construimos sistemas de posicionamiento, contenido y conversión para negocios que son mejores de lo que parecen digitalmente. PHANTOM — sprint de implementación de 30 días.",
+    "Ayudamos a negocios sólidos a verse online a la altura de lo que entregan y a hacer más claro el camino del interés a una conversación comercial. Conoce SCALE BASIC, PHANTOM 30 y SCALE FULL.",
   keywords: [
     "SCALEVO",
-    "PHANTOM",
+    "PHANTOM 30",
+    "SCALE BASIC",
+    "SCALE FULL",
     "posicionamiento digital",
-    "sistema de adquisición",
-    "branding estratégico",
-    "contenido de conversión",
+    "videos para negocios",
+    "oportunidades comerciales",
     "marketing México",
-    "agencia de posicionamiento",
   ],
 } as const;
 
@@ -52,20 +82,31 @@ export const SOCIAL = {
   },
 } as const;
 
-/**
- * Calendly URL — single source.
- * Internal CTAs do NOT carry link_in_bio UTMs.
- * Entry UTMs are captured on page load and stored in sessionStorage.
- * Each CTA passes its placement via event properties, not via URL UTMs.
- */
-export const CALENDLY_URL =
-  "https://calendly.com/scalevo-mx/30min";
+/** Single source for every booking link and postMessage origin check. */
+export const CALENDLY_URL = "https://calendly.com/scalevo-mx/30min";
+export const CALENDLY_ORIGIN = new URL(CALENDLY_URL).origin;
+export const BOOKING = {
+  url: CALENDLY_URL,
+  durationMinutes: 30,
+  enabled: RUNTIME_GATES.calendly.enabled,
+  state: RUNTIME_GATES.calendly.state,
+} as const;
+
+export const CTA_LABELS = {
+  booking: "AGENDAR MI DIAGNÓSTICO",
+  primary: RUNTIME_GATES.calendly.enabled
+    ? "AGENDAR MI DIAGNÓSTICO"
+    : "CONOCER EL DIAGNÓSTICO",
+  secondary: "Ver cómo lo resolvemos ↓",
+  calendlyFallback: "ABRIR CALENDLY →",
+} as const;
 
 export const NAV_LINKS = [
   { label: "Sistema", href: "#phantom-system", id: "nav-sistema" },
+  { label: "Rutas", href: "#product-ladder", id: "nav-rutas" },
   { label: "Phantom 30", href: "#phantom-30", id: "nav-phantom30" },
-  { label: "Evidencia", href: "#evidence", id: "nav-evidencia" },
-  { label: "Diagnóstico", href: "#diagnostic", id: "nav-diagnostic" },
+  { label: "Método", href: "#method", id: "nav-metodo" },
+  { label: "Diagnóstico", href: "#diagnostic", id: "nav-diagnostico" },
 ] as const;
 
 export const OG_IMAGE = {
