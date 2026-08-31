@@ -53,12 +53,22 @@ export default function ProductLadder() {
                   <p className="product-route-job">{route.job}</p>
                 </div>
                 <h3 className="product-route-question">{route.question}</h3>
-                <p className="product-route-description">{route.description}</p>
+                <p className="product-route-description">
+                  {route.ladderSummary}
+                </p>
+                {"founding" in route && (
+                  <p
+                    className="product-route-founding"
+                    data-founding-remaining={route.founding.remaining}
+                  >
+                    {route.founding.availabilityLabel}
+                  </p>
+                )}
                 <p className="product-route-terms">{route.terms}</p>
                 <p className="product-route-disclosure">{route.disclosure}</p>
-                {"scopeDisclosure" in route && (
-                  <p className="product-route-disclosure">
-                    {route.scopeDisclosure}
+                {"ladderNote" in route && (
+                  <p className="product-route-note">
+                    {route.ladderNote}
                   </p>
                 )}
               </div>

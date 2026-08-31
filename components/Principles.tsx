@@ -44,53 +44,28 @@ export default function Principles() {
 
   useEffect(() => {
     const tier = getMotionTier();
-    const usePins = tier !== "lite" && tier !== "reduced";
 
-    // Kinetic text
+    // Kinetic text reveals once; it never pins or takes over scrolling.
     const kineticCtx = gsap.context(() => {
       const words = gsap.utils.toArray<HTMLElement>(".kinetic-word");
 
       if (tier === "reduced") {
-        gsap.set(words, { opacity: 1, x: 0 });
+        gsap.set(words, { opacity: 1, x: 0, y: 0 });
         return;
       }
 
-      if (!usePins) {
-        // Simple fade-in for the lite tier.
-        gsap.fromTo(
-          words,
-          { opacity: 0 },
-          {
-            opacity: 1, duration: 0.6, stagger: 0.2, ease: "power2.out",
-            scrollTrigger: { trigger: kineticRef.current, start: "top 80%" },
-          }
-        );
-        return;
-      }
-
-      const tl = gsap.timeline({
-        scrollTrigger: {
-          trigger: kineticRef.current,
-          start: "top top",
-          end: "+=250%",
-          scrub: 1.2,
-          pin: true,
-          anticipatePin: 1,
+      gsap.fromTo(
+        words,
+        { opacity: 0, y: 20 },
+        {
+          opacity: 1,
+          y: 0,
+          duration: 0.6,
+          stagger: 0.12,
+          ease: "power3.out",
+          scrollTrigger: { trigger: kineticRef.current, start: "top 78%" },
         },
-      });
-
-      words.forEach((word, i) => {
-        const direction = i % 2 === 0 ? 1 : -1;
-        gsap.set(word, { x: direction * (window.innerWidth * 0.4), opacity: 0 });
-        tl.to(word, { x: 0, opacity: 1, duration: 1, ease: "power3.out" }, i * 0.8);
-
-        if (i === words.length - 1) {
-          tl.to(word, {
-            duration: 0.5,
-            onStart: () => word.classList.add("filled"),
-          }, (i + 0.5) * 0.8);
-        }
-      });
+      );
     }, kineticRef);
 
     // Manifesto pillars
@@ -105,7 +80,7 @@ export default function Principles() {
       }
       gsap.fromTo(
         ".principle-pillar",
-        { opacity: 0, x: 30 },
+        { opacity: 0, x: 18 },
         {
           opacity: 1, x: 0, duration: 0.7, stagger: 0.1, ease: "power3.out",
           scrollTrigger: { trigger: ".principles-grid", start: "top 82%" },
@@ -113,9 +88,9 @@ export default function Principles() {
       );
       gsap.fromTo(
         ".principles-big-text",
-        { opacity: 0, y: 60 },
+        { opacity: 0, y: 20 },
         {
-          opacity: 1, y: 0, duration: 1, ease: "power3.out",
+          opacity: 1, y: 0, duration: 0.65, ease: "power3.out",
           scrollTrigger: { trigger: ".principles-big-text", start: "top 85%" },
         }
       );
@@ -134,15 +109,14 @@ export default function Principles() {
         ref={kineticRef}
         className="kinetic-section"
         aria-label="Manifiesto SCALEVO"
-        style={{ height: "100dvh" }}
       >
         <div className="kinetic-pin-container">
           {phrases.map((phrase, i) => (
             <div
               key={i}
-              className="kinetic-word"
+              className={`kinetic-word${phrase.filled ? " filled" : ""}`}
               style={{
-                top: `${30 + i * 28}%`,
+                top: `${22 + i * 28}%`,
                 left: i % 2 === 0 ? "5%" : undefined,
                 right: i % 2 !== 0 ? "5%" : undefined,
               }}

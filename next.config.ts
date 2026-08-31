@@ -3,6 +3,10 @@ import { RUNTIME_GATES } from "./config/gates";
 
 const devEval = process.env.NODE_ENV === "production" ? "" : " 'unsafe-eval'";
 const calendlyEnabled = RUNTIME_GATES.calendly.enabled;
+const isIndexable =
+  RUNTIME_GATES.publicDomain.approved &&
+  RUNTIME_GATES.publication.productionAuthorized &&
+  process.env.VERCEL_ENV === "production";
 const contentSecurityPolicy = [
   "default-src 'self'",
   `script-src 'self' 'unsafe-inline'${devEval}${calendlyEnabled ? " https://assets.calendly.com" : ""}`,
@@ -28,9 +32,12 @@ const securityHeaders = [
   {
     key: "Permissions-Policy",
     value:
-      "camera=(), microphone=(), geolocation=(), browsing-topics=(), gyroscope=(self)",
+      "camera=(), microphone=(), geolocation=(), browsing-topics=(), gyroscope=()",
   },
   { key: "Content-Security-Policy", value: contentSecurityPolicy },
+  ...(!isIndexable
+    ? [{ key: "X-Robots-Tag", value: "noindex, nofollow" }]
+    : []),
 ];
 
 const nextConfig: NextConfig = {

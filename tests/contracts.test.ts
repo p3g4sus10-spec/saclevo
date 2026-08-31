@@ -2,10 +2,20 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { metadata as privacyMetadata } from "@/app/privacidad/page";
 import robots from "@/app/robots";
 import sitemap from "@/app/sitemap";
-import { RUNTIME_GATES } from "@/config/gates";
 import {
+  LEGAL_FISCAL_GATES,
+  RUNTIME_GATES,
+  WEBSITE_RELEASE,
+} from "@/config/gates";
+import {
+  calculateFoundingAvailability,
   formatMxn,
+  FOUNDING_CLOSED,
+  FOUNDING_REMAINING,
+  FOUNDING_TOTAL,
+  FOUNDING_USED,
   PHANTOM_30,
+  PHANTOM_30_FOUNDING,
   PRICING_POLICY,
   PRODUCT_ROUTES,
   SCALE_BASIC,
@@ -87,6 +97,16 @@ describe("publication and privacy gates", () => {
     const sitemapPaths = sitemap().map((entry) => new URL(entry.url).pathname);
     expect(sitemapPaths).not.toContain("/privacidad");
   });
+
+  it("marks V2.1 frozen while every unresolved legal gate stays open", () => {
+    expect(WEBSITE_RELEASE).toMatchObject({
+      version: "2.1",
+      state: "frozen_ready_for_legal_final_patch",
+    });
+    expect(new Set(Object.values(LEGAL_FISCAL_GATES))).toEqual(
+      new Set(["open_unconfirmed"]),
+    );
+  });
 });
 
 describe("canonical offer and tax-safe copy", () => {
@@ -101,7 +121,7 @@ describe("canonical offer and tax-safe copy", () => {
     });
   });
 
-  it("defines SCALE BASIC as five business days, advisory and no production", () => {
+  it("defines SCALE BASIC as five business days, strategic advice and no production", () => {
     expect(SCALE_BASIC).toMatchObject({
       durationBusinessDays: 5,
       priceBase: 7_500,
@@ -111,7 +131,40 @@ describe("canonical offer and tax-safe copy", () => {
     expect(SCALE_BASIC.description).toContain("5 días hábiles");
     expect(SCALE_BASIC.terms).toContain("5 días hábiles");
     expect(SCALE_BASIC.terms).toContain(`${formatMxn(7_500)} antes de IVA`);
-    expect(SCALE_BASIC.terms).toContain("advisory, sin producción");
+    expect(SCALE_BASIC.terms).toContain("asesoría estratégica, sin producción");
+    expect(SCALE_BASIC.terms).not.toContain("advisory");
+  });
+
+  it("derives the four real Founding slots and a safe closed state", () => {
+    expect({
+      total: FOUNDING_TOTAL,
+      used: FOUNDING_USED,
+      remaining: FOUNDING_REMAINING,
+      closed: FOUNDING_CLOSED,
+    }).toEqual({ total: 4, used: 0, remaining: 4, closed: false });
+    expect(PHANTOM_30_FOUNDING.availabilityLabel).toBe(
+      "4 CUPOS FOUNDING DISPONIBLES",
+    );
+    expect(PHANTOM_30_FOUNDING.statusLabel).toBe(
+      "FASE FOUNDING · SOLO 4 CUPOS DISPONIBLES",
+    );
+    expect(calculateFoundingAvailability(4, 4)).toEqual({
+      total: 4,
+      used: 4,
+      remaining: 0,
+      closed: true,
+    });
+    for (const [total, used] of [
+      [0, 0],
+      [4, -1],
+      [4, 5],
+      [4.5, 0],
+      [4, 1.5],
+    ]) {
+      expect(() => calculateFoundingAvailability(total, used)).toThrow(
+        RangeError,
+      );
+    }
   });
 
   it("keeps PHANTOM 30 economics and finished-video scope unambiguous", () => {
@@ -126,9 +179,10 @@ describe("canonical offer and tax-safe copy", () => {
     expect(PHANTOM_30.description).toContain("cuatro videos terminados");
     expect(PHANTOM_30.deliverables.flatMap((group) => group.items)).toEqual(
       expect.arrayContaining([
-        "Concepto, guion y preproducción",
-        "Grabación ligera acordada y dirección creativa",
-        "Edición y entrega final",
+        "Concepto, hook y guion/estructura",
+        "Dirección creativa, preproducción y grabación ligera acordada",
+        "Edición, audio y captions/gráficos básicos cuando corresponda",
+        "Color/acabado, export y entrega final",
       ]),
     );
     expect(PHANTOM_30.price.terms).toContain(
@@ -137,14 +191,16 @@ describe("canonical offer and tax-safe copy", () => {
     expect(PHANTOM_30.price.terms).toContain(
       `${formatMxn(4_500)} antes de IVA incluida dentro de esos $9,000`,
     );
-    expect(PHANTOM_30.price.note).toContain("forma parte de ese precio");
+    expect(PHANTOM_30.price.note).toContain("forma parte de esa tarifa");
     expect(PHANTOM_30.price.note).toContain("no se suma");
     expect(PHANTOM_30.durationCondition).toContain(
       "condiciones de activación definidas por escrito",
     );
-    expect(PHANTOM_30.scopeNote).toContain("Raw");
+    expect(PHANTOM_30.scopeNote).toContain("archivos raw");
     expect(PHANTOM_30.scopeNote).toContain("project files");
-    expect(PHANTOM_30.scopeNote).toContain("no están incluidos");
+    expect(PHANTOM_30.scopeNote).toContain("equipo especial");
+    expect(PHANTOM_30.scopeNote).toContain("producción extraordinaria");
+    expect(PHANTOM_30.scopeNote).toContain("No incluye automáticamente");
     expect(PHANTOM_30.claimsDisclosure).toContain("No se garantizan ventas");
   });
 
@@ -157,15 +213,18 @@ describe("canonical offer and tax-safe copy", () => {
     });
     expect(SCALE_FULL.terms).toContain("Ciclo inicial propuesto de 90 días");
     expect(SCALE_FULL.terms).toContain(
-      `desde ${formatMxn(72_000)}/mes + ${formatMxn(15_000)} de onboarding`,
+      `desde ${formatMxn(72_000)}/mes antes de IVA`,
     );
-    expect(SCALE_FULL.terms).toContain("ambos antes de IVA");
+    expect(SCALE_FULL.terms).toContain(
+      `puesta en marcha (onboarding) ${formatMxn(15_000)} una sola vez antes de IVA`,
+    );
     expect(SCALE_FULL.cycleReason).toContain(
       "ciclo inicial propuesto de 90 días",
     );
     expect(SCALE_FULL.scopeDisclosure).toContain(
       "sujeto a validación comercial",
     );
+    expect(SCALE_FULL.scopeDisclosure).not.toContain("scope");
     expect(SCALE_FULL.terms).not.toMatch(/90\s+días\s+mínimo/i);
     expect(SCALE_FULL_PREREQUISITES).toContain(
       "una persona responsable dentro del negocio",
@@ -193,9 +252,12 @@ describe("canonical offer and tax-safe copy", () => {
     expect(faqById["precio-phantom-30"]).toContain(SAFE_TAX_DISCLOSURE);
     expect(faqById["scale-basic"]).toContain("cinco días hábiles");
     expect(faqById["scale-basic"]).toContain("no incluye producción");
+    expect(faqById["scale-basic"]).not.toContain("advisory");
     expect(faqById["scale-full"]).toContain(formatMxn(72_000));
     expect(faqById["scale-full"]).toContain(formatMxn(15_000));
     expect(faqById["scale-full"]).toContain("onboarding");
+    expect(faqById["scale-full"]).toContain("puesta en marcha");
+    expect(faqById["scale-full"]).toContain("una sola vez");
     expect(faqById["scale-full"]).toContain("ciclo inicial propuesto de 90 días");
     expect(faqById["clientes-internacionales"]).toContain(
       "no garantiza IVA a tasa 0%",

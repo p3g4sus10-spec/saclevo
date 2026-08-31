@@ -21,15 +21,15 @@ export default function FAQ() {
       if (getMotionTier() === 'reduced') return;
       gsap.fromTo(
         ".faq-header",
-        { opacity: 0, y: 40 },
+        { opacity: 0, y: 18 },
         {
-          opacity: 1, y: 0, duration: 0.8, ease: "power3.out",
+          opacity: 1, y: 0, duration: 0.6, ease: "power3.out",
           scrollTrigger: { trigger: ".faq-header", start: "top 82%" },
         }
       );
       gsap.fromTo(
         ".faq-item",
-        { opacity: 0, y: 20 },
+        { opacity: 0, y: 12 },
         {
           opacity: 1, y: 0, duration: 0.5, stagger: 0.06, ease: "power3.out",
           scrollTrigger: { trigger: ".faq-list", start: "top 82%" },

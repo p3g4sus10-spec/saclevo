@@ -1,7 +1,9 @@
 import {
   CLAIMS_DISCLOSURE,
   formatMxn,
+  FOUNDING_CLOSED,
   PHANTOM_30,
+  PHANTOM_30_FOUNDING,
   PRICING_POLICY,
   SCALE_BASIC,
   SCALE_FULL,
@@ -26,7 +28,7 @@ export const FAQ_ITEMS = [
   {
     id: "que-incluye",
     q: "¿Qué incluye PHANTOM 30?",
-    a: "PHANTOM 30 incluye cuatro videos terminados dentro del alcance escrito: concepto, guion, preproducción, grabación ligera acordada, edición y entrega final. Antes de comenzar se fijan formato, duración, calendario, participantes, una ronda consolidada y criterios de aceptación. Raw, project files y gastos externos no están incluidos salvo Change Order escrito.",
+    a: `PHANTOM 30 incluye cuatro videos terminados dentro del alcance escrito: ${PHANTOM_30.videoScopeSummary} Antes de comenzar se fijan formato, duración, calendario, participantes, una ronda consolidada y criterios de aceptación. ${PHANTOM_30.exclusionsSummary} Cualquier extra requiere Change Order escrito.`,
   },
   {
     id: "cambio-de-marca",
@@ -56,17 +58,19 @@ export const FAQ_ITEMS = [
   {
     id: "precio-phantom-30",
     q: "¿Cuánto cuesta PHANTOM 30?",
-    a: `El precio base Founding actual es ${formatMxn(PHANTOM_30.price.base)} antes de IVA. La primera parcialidad base es ${formatMxn(PHANTOM_30.price.firstInstallment)} antes de IVA y está incluida dentro de esos ${formatMxn(PHANTOM_30.price.base)}; no se suma. ${PRICING_POLICY.safeDisclosure}`,
+    a: FOUNDING_CLOSED
+      ? PHANTOM_30_FOUNDING.closedCopy
+      : `La tarifa Founding de implementación es ${formatMxn(PHANTOM_30.price.base)} antes de IVA. La primera parcialidad base es ${formatMxn(PHANTOM_30.price.firstInstallment)} antes de IVA y está incluida dentro de esos ${formatMxn(PHANTOM_30.price.base)}; no se suma. ${PHANTOM_30_FOUNDING.principle} ${PRICING_POLICY.safeDisclosure}`,
   },
   {
     id: "scale-basic",
     q: "¿Qué es SCALE BASIC?",
-    a: `Es una intervención advisory de cinco días hábiles con precio base actual de ${formatMxn(SCALE_BASIC.priceBase)} antes de IVA. Aclara posición, oferta y siguiente ruta; no incluye producción. ${SCALE_BASIC.disclosure}`,
+    a: `Es una asesoría estratégica de cinco días hábiles con precio base actual de ${formatMxn(SCALE_BASIC.priceBase)} antes de IVA. Aclara posicionamiento, oferta y siguiente paso; no incluye producción. ${SCALE_BASIC.disclosure}`,
   },
   {
     id: "scale-full",
     q: "¿Qué es SCALE FULL?",
-    a: `Es un modelo de operación integrada para equipos que ya tienen una base clara y capacidad de ejecución. El modelo comercial actual parte de ${formatMxn(SCALE_FULL.monthlyFrom)} por mes más ${formatMxn(SCALE_FULL.onboarding)} de onboarding, ambos antes de IVA, en un ciclo inicial propuesto de 90 días. ${SCALE_FULL.scopeDisclosure} ${SCALE_FULL.disclosure}`,
+    a: `Es un modelo de operación integrada para equipos que ya tienen una base clara y capacidad de ejecución. Parte de ${formatMxn(SCALE_FULL.monthlyFrom)} por mes antes de IVA, más una puesta en marcha (onboarding) de ${formatMxn(SCALE_FULL.onboarding)} una sola vez antes de IVA. Trabajamos en un ciclo inicial propuesto de 90 días para instalar, operar, medir y optimizar. ${SCALE_FULL.scopeDisclosure} ${SCALE_FULL.disclosure}`,
   },
   {
     id: "clientes-internacionales",

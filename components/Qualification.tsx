@@ -17,23 +17,23 @@ export default function Qualification() {
       if (getMotionTier() === "reduced") return;
       gsap.fromTo(
         ".qual-header",
-        { opacity: 0, y: 40 },
+        { opacity: 0, y: 18 },
         {
           opacity: 1,
           y: 0,
-          duration: 0.8,
+          duration: 0.6,
           ease: "power3.out",
           scrollTrigger: { trigger: ".qual-header", start: "top 82%" },
         },
       );
       gsap.fromTo(
         ".qual-col",
-        { opacity: 0, y: 40 },
+        { opacity: 0, y: 18 },
         {
           opacity: 1,
           y: 0,
-          duration: 0.7,
-          stagger: 0.15,
+          duration: 0.6,
+          stagger: 0.1,
           ease: "power3.out",
           scrollTrigger: { trigger: ".qual-grid", start: "top 80%" },
         },

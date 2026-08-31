@@ -63,10 +63,10 @@ export default function SystemEvidence() {
       if (getMotionTier() === 'reduced') return;
       gsap.fromTo(
         ".ev-cell",
-        { opacity: 0, y: 50, scale: 0.96 },
+        { opacity: 0, y: 20, scale: 0.99 },
         {
-          opacity: 1, y: 0, scale: 1, duration: 0.7, ease: "power3.out",
-          stagger: { amount: 0.5, from: "start" },
+          opacity: 1, y: 0, scale: 1, duration: 0.6, ease: "power3.out",
+          stagger: { amount: 0.35, from: "start" },
           scrollTrigger: { trigger: ".ev-grid", start: "top 82%" },
         }
       );

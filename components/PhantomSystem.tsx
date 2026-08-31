@@ -22,9 +22,9 @@ export default function PhantomSystem() {
       // Header
       gsap.fromTo(
         ".phantom-system-header",
-        { opacity: 0, y: 40 },
+        { opacity: 0, y: 18 },
         {
-          opacity: 1, y: 0, duration: 0.9, ease: "power3.out",
+          opacity: 1, y: 0, duration: 0.65, ease: "power3.out",
           scrollTrigger: { trigger: ".phantom-system-header", start: "top 82%" },
         }
       );
@@ -32,9 +32,9 @@ export default function PhantomSystem() {
       // Stage cards stagger
       gsap.fromTo(
         ".phantom-stage",
-        { opacity: 0, y: 50 },
+        { opacity: 0, y: 20 },
         {
-          opacity: 1, y: 0, duration: 0.7, stagger: 0.1, ease: "power3.out",
+          opacity: 1, y: 0, duration: 0.6, stagger: 0.08, ease: "power3.out",
           scrollTrigger: { trigger: ".phantom-stages", start: "top 80%" },
         }
       );

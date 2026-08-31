@@ -19,9 +19,9 @@ export default function PerceptionGap() {
       // Headline entrance
       gsap.fromTo(
         ".pg-headline",
-        { opacity: 0, y: 50 },
+        { opacity: 0, y: 20 },
         {
-          opacity: 1, y: 0, duration: 1, ease: "power3.out",
+          opacity: 1, y: 0, duration: 0.65, ease: "power3.out",
           scrollTrigger: { trigger: ".pg-headline", start: "top 80%" },
         }
       );
@@ -29,9 +29,9 @@ export default function PerceptionGap() {
       // Left/right columns stagger
       gsap.fromTo(
         ".pg-col",
-        { opacity: 0, y: 40 },
+        { opacity: 0, y: 18 },
         {
-          opacity: 1, y: 0, duration: 0.8, stagger: 0.15, ease: "power3.out",
+          opacity: 1, y: 0, duration: 0.6, stagger: 0.12, ease: "power3.out",
           scrollTrigger: { trigger: ".pg-columns", start: "top 82%" },
         }
       );
@@ -41,7 +41,7 @@ export default function PerceptionGap() {
         ".pg-divider-line",
         { scaleX: 0 },
         {
-          scaleX: 1, duration: 1.2, ease: "power3.inOut",
+          scaleX: 1, duration: 0.7, ease: "power3.inOut",
           scrollTrigger: { trigger: ".pg-divider-line", start: "top 85%" },
         }
       );
@@ -49,9 +49,9 @@ export default function PerceptionGap() {
       // Closing statement
       gsap.fromTo(
         ".pg-close",
-        { opacity: 0, y: 30 },
+        { opacity: 0, y: 16 },
         {
-          opacity: 1, y: 0, duration: 0.8, ease: "power3.out",
+          opacity: 1, y: 0, duration: 0.6, ease: "power3.out",
           scrollTrigger: { trigger: ".pg-close", start: "top 88%" },
         }
       );

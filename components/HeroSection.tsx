@@ -138,21 +138,21 @@ export default function HeroSection() {
       gsap.set(contentRef.current, { opacity: 0 });
       gsap.set(scrollRef.current, { opacity: 0 });
 
-      const tl = gsap.timeline({ defaults: { ease: "power3.out" }, delay: 0.1 });
-      tl.to(contentRef.current, { opacity: 1, duration: 0.8 })
+      const tl = gsap.timeline({ defaults: { ease: "power3.out" }, delay: 0.05 });
+      tl.to(contentRef.current, { opacity: 1, duration: 0.55 })
         .fromTo(
           ".line-inner",
-          { y: 80, rotationZ: 4, opacity: 0 },
-          { y: 0, rotationZ: 0, opacity: 1, duration: 1, stagger: 0.15 },
-          "-=0.6"
+          { y: 24, opacity: 0 },
+          { y: 0, opacity: 1, duration: 0.65, stagger: 0.1 },
+          "-=0.35"
         )
         .fromTo(
           ".hero-eyebrow, .hero-subtitle, .hero-cta-group, .hero-microcopy",
-          { y: 30, opacity: 0 },
-          { y: 0, opacity: 1, duration: 0.8, stagger: 0.1 },
-          "-=0.6"
+          { y: 16, opacity: 0 },
+          { y: 0, opacity: 1, duration: 0.55, stagger: 0.07 },
+          "-=0.4"
         )
-        .to(scrollRef.current, { opacity: 1, duration: 0.8 }, "-=0.2");
+        .to(scrollRef.current, { opacity: 1, duration: 0.45 }, "-=0.15");
     }, sectionRef);
 
     if (tier === "reduced") {

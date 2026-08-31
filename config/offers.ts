@@ -8,9 +8,82 @@ export const PRICING_POLICY = {
   publicTaxRate: null,
 } as const;
 
-export function formatMxn(value: number): string {
-  return `$${value.toLocaleString("es-MX")} MXN`;
+export function formatMxnAmount(value: number): string {
+  return `$${value.toLocaleString("es-MX")}`;
 }
+
+export function formatMxn(value: number): string {
+  return `${formatMxnAmount(value)} MXN`;
+}
+
+const SCALE_BASIC_PRICE = 7_500;
+const PHANTOM_30_PRICE = 9_000;
+const PHANTOM_30_FIRST_INSTALLMENT = 4_500;
+const SCALE_FULL_MONTHLY_FROM = 72_000;
+const SCALE_FULL_ONBOARDING = 15_000;
+
+export function calculateFoundingAvailability(total: number, used: number) {
+  if (!Number.isInteger(total) || total < 1) {
+    throw new RangeError("FOUNDING_TOTAL must be a positive integer");
+  }
+
+  if (!Number.isInteger(used) || used < 0 || used > total) {
+    throw new RangeError("FOUNDING_USED must be an integer between 0 and total");
+  }
+
+  const remaining = total - used;
+  return {
+    total,
+    used,
+    remaining,
+    closed: remaining === 0,
+  } as const;
+}
+
+export const FOUNDING_TOTAL = 4;
+
+/**
+ * Owner-controlled inventory. Increase only after the corresponding SOW is
+ * accepted and the first installment has been received. Leads, diagnostics,
+ * proposals and verbal commitments do not consume a slot.
+ */
+export const FOUNDING_USED = 0;
+
+const foundingAvailability = calculateFoundingAvailability(
+  FOUNDING_TOTAL,
+  FOUNDING_USED,
+);
+
+export const FOUNDING_REMAINING = foundingAvailability.remaining;
+export const FOUNDING_CLOSED = foundingAvailability.closed;
+
+const foundingCountLabel = `${FOUNDING_REMAINING} ${
+  FOUNDING_REMAINING === 1 ? "CUPO" : "CUPOS"
+}`;
+const foundingAvailabilityLabel = `${foundingCountLabel} FOUNDING ${
+  FOUNDING_REMAINING === 1 ? "DISPONIBLE" : "DISPONIBLES"
+}`;
+const foundingStatusLabel = `${foundingCountLabel} ${
+  FOUNDING_REMAINING === 1 ? "DISPONIBLE" : "DISPONIBLES"
+}`;
+
+export const PHANTOM_30_FOUNDING = {
+  ...foundingAvailability,
+  availabilityLabel: FOUNDING_CLOSED
+    ? "FASE FOUNDING CERRADA"
+    : foundingAvailabilityLabel,
+  statusLabel: FOUNDING_CLOSED
+    ? "FASE FOUNDING · CERRADA"
+    : `FASE FOUNDING · SOLO ${foundingStatusLabel}`,
+  principle: "Founding cambia la tarifa, no el alcance.",
+  phaseCopy: `Durante los primeros cuatro proyectos Founding, PHANTOM 30 mantiene una tarifa de ${formatMxn(PHANTOM_30_PRICE)} antes de IVA.`,
+  evidenceCopy:
+    "Cada implementación se ejecutará y documentará para convertir la experiencia real en evidencia del sistema. Al cerrar esta fase, la tarifa Founding termina.",
+  futureRateCopy:
+    "La tarifa estándar posterior se definirá con datos reales de ejecución, capacidad y costos.",
+  closedCopy:
+    "La fase Founding ha finalizado. La disponibilidad y tarifa actual se confirman en diagnóstico.",
+} as const;
 
 export const CLAIMS_DISCLOSURE =
   "Scalevo presta servicios y entrega los activos definidos por escrito. Los resultados comerciales dependen también del mercado, la oferta, la ejecución del cliente, el presupuesto, las plataformas y otros factores fuera de control. No se garantizan ventas, leads, vistas, viralidad, ROI, rankings ni aprobación de terceros.";
@@ -21,11 +94,13 @@ export const SCALE_BASIC = {
   name: "SCALE BASIC",
   job: "ACLARAR LO ESENCIAL",
   durationBusinessDays: 5,
-  priceBase: 7500,
+  priceBase: SCALE_BASIC_PRICE,
   question: "¿Tu oferta todavía cuesta trabajo explicar?",
   description:
-    "En 5 días hábiles ordenamos qué vendes, para quién, por qué importa y cuál debe ser el siguiente paso. Es una asesoría acotada (advisory): recibes diagnóstico y una ruta clara; no incluye producción.",
-  terms: `5 días hábiles · ${formatMxn(7500)} antes de IVA · advisory, sin producción`,
+    "En 5 días hábiles aclaramos posicionamiento, oferta y siguiente paso. Es una asesoría estratégica, sin producción.",
+  ladderSummary:
+    "Aclaramos posicionamiento, oferta y siguiente paso en 5 días. Asesoría estratégica, sin producción.",
+  terms: `5 días hábiles · ${formatMxn(SCALE_BASIC_PRICE)} antes de IVA · asesoría estratégica, sin producción`,
   disclosure: PRICING_POLICY.safeDisclosure,
   includesProduction: false,
 } as const;
@@ -41,20 +116,20 @@ export const PHANTOM_30 = {
     "¿Tu negocio cumple, pero en internet no se entiende ni se siente al mismo nivel?",
   headline: "30 días para que tu negocio se vea tan sólido como es.",
   description:
-    "Un sprint de diagnóstico e implementación que entrega cuatro videos terminados dentro del alcance escrito: concepto, guion, preproducción, grabación ligera acordada, edición y entrega final.",
+    "Un sprint de diagnóstico e implementación que mejora cómo te presentas y entrega cuatro videos terminados conectados a un siguiente paso comercial.",
+  ladderSummary:
+    "Reestructuramos cómo te presentas y construimos 4 videos terminados conectados a un siguiente paso comercial.",
   valueStatement:
     "No estás comprando contenido por contenido. Estás invirtiendo en mejorar cómo te descubren, te entienden y llegan a una conversación contigo.",
   price: {
-    base: 9000,
+    base: PHANTOM_30_PRICE,
     currency: PRICING_POLICY.currency,
-    firstInstallment: 4500,
-    baseBalance: 4500,
-    label: "PRECIO BASE FOUNDING · ANTES DE IVA",
-    installmentLabel:
-      "PRIMERA PARCIALIDAD BASE · INCLUIDA EN LOS $9,000 · ANTES DE IVA",
-    terms: `30 días · ${formatMxn(9000)} antes de IVA · primera parcialidad de ${formatMxn(4500)} antes de IVA incluida dentro de esos $9,000`,
-    note:
-      "El precio base Founding es $9,000 MXN antes de IVA. La primera parcialidad base de $4,500 MXN antes de IVA forma parte de ese precio; no se suma. El saldo base es $4,500 MXN antes de IVA conforme al hito o fecha acordados por escrito.",
+    firstInstallment: PHANTOM_30_FIRST_INSTALLMENT,
+    baseBalance: PHANTOM_30_PRICE - PHANTOM_30_FIRST_INSTALLMENT,
+    label: "TARIFA FOUNDING DE IMPLEMENTACIÓN · ANTES DE IVA",
+    installmentLabel: `PRIMERA PARCIALIDAD BASE · INCLUIDA EN LOS ${formatMxnAmount(PHANTOM_30_PRICE)} · ANTES DE IVA`,
+    terms: `30 días · ${formatMxn(PHANTOM_30_PRICE)} antes de IVA · primera parcialidad de ${formatMxn(PHANTOM_30_FIRST_INSTALLMENT)} antes de IVA incluida dentro de esos ${formatMxnAmount(PHANTOM_30_PRICE)}`,
+    note: `La tarifa Founding de implementación es ${formatMxn(PHANTOM_30_PRICE)} antes de IVA. La primera parcialidad base de ${formatMxn(PHANTOM_30_FIRST_INSTALLMENT)} antes de IVA forma parte de esa tarifa; no se suma. El saldo base es ${formatMxn(PHANTOM_30_PRICE - PHANTOM_30_FIRST_INSTALLMENT)} antes de IVA conforme al hito o fecha acordados por escrito.`,
     disclosure: PRICING_POLICY.safeDisclosure,
   },
   duration: "30 días",
@@ -104,9 +179,10 @@ export const PHANTOM_30 = {
     {
       area: "4 VIDEOS TERMINADOS",
       items: [
-        "Concepto, guion y preproducción",
-        "Grabación ligera acordada y dirección creativa",
-        "Edición y entrega final",
+        "Concepto, hook y guion/estructura",
+        "Dirección creativa, preproducción y grabación ligera acordada",
+        "Edición, audio y captions/gráficos básicos cuando corresponda",
+        "Color/acabado, export y entrega final",
       ],
     },
     {
@@ -126,8 +202,12 @@ export const PHANTOM_30 = {
       ],
     },
   ],
+  videoScopeSummary:
+    "Concepto, hook, guion o estructura, dirección creativa, preproducción, grabación ligera acordada, edición, audio, captions o gráficos básicos cuando corresponda, color o acabado, export y entrega final.",
+  exclusionsSummary:
+    "No incluye automáticamente archivos raw, tomas descartadas, project files, talento costoso, locaciones extraordinarias, viajes, licencias, pauta, equipo especial ni producción extraordinaria.",
   scopeNote:
-    "Incluye cuatro videos terminados conforme a formato, duración, grabación, revisión y especificaciones pactadas. Raw, tomas descartadas, project files, pauta, talento, locaciones, viajes, música, stock, licencias y otros gastos externos no están incluidos salvo Change Order escrito.",
+    "Incluye cuatro videos terminados conforme al formato, duración, grabación, revisión y especificaciones pactadas. No incluye automáticamente archivos raw, tomas descartadas, project files, talento costoso, locaciones extraordinarias, viajes, licencias, pauta, equipo especial ni producción extraordinaria. Cualquier extra requiere Change Order escrito.",
   claimsDisclosure: CLAIMS_DISCLOSURE,
 } as const;
 
@@ -136,18 +216,22 @@ export const SCALE_FULL = {
   index: "03",
   name: "SCALE FULL",
   job: "OPERAR Y MEJORAR DE FORMA CONTINUA",
-  monthlyFrom: 72000,
-  onboarding: 15000,
+  monthlyFrom: SCALE_FULL_MONTHLY_FROM,
+  onboarding: SCALE_FULL_ONBOARDING,
   proposedInitialCycleDays: 90,
   question:
     "¿Ya tienes una base clara y necesitas un equipo que opere y mejore el sistema contigo?",
   description:
-    "Trabajamos contigo de forma continua en mensaje, contenido, camino de contacto, seguimiento comercial y medición. El onboarding prepara prioridades, responsables, accesos, medición y plan de ejecución.",
+    "Trabajamos contigo de forma continua en mensaje, contenido, conversión, seguimiento comercial y medición. La puesta en marcha (onboarding) prepara prioridades, responsables, accesos, medición y el plan de ejecución.",
+  ladderSummary:
+    "Operamos contigo contenido, conversión, seguimiento y medición de forma continua.",
   cycleReason:
-    "Trabajamos en un ciclo inicial propuesto de 90 días para tener tiempo de instalar, medir y optimizar.",
-  terms: `Ciclo inicial propuesto de 90 días · desde ${formatMxn(72000)}/mes + ${formatMxn(15000)} de onboarding, ambos antes de IVA`,
+    "Trabajamos en un ciclo inicial propuesto de 90 días: tiempo suficiente para instalar, operar, medir y optimizar.",
+  terms: `Ciclo inicial propuesto de 90 días · desde ${formatMxn(SCALE_FULL_MONTHLY_FROM)}/mes antes de IVA · puesta en marcha (onboarding) ${formatMxn(SCALE_FULL_ONBOARDING)} una sola vez antes de IVA`,
+  ladderNote:
+    "Un ciclo inicial suficiente para instalar, operar, medir y optimizar. Sujeto al alcance exacto y validación comercial.",
   scopeDisclosure:
-    "“Desde” no fija el precio final. El scope, la mensualidad exacta, el onboarding, la capacidad, los límites, el calendario y la terminación se confirman por escrito antes de comenzar. El modelo sigue sujeto a validación comercial.",
+    "“Desde” no fija el precio final. El alcance, la mensualidad exacta, la puesta en marcha, la capacidad, los límites, el calendario y la terminación se confirman por escrito antes de comenzar. El modelo sigue sujeto a validación comercial.",
   disclosure: PRICING_POLICY.safeDisclosure,
 } as const;
 
@@ -156,13 +240,16 @@ export const PRODUCT_ROUTES = [
   {
     ...PHANTOM_30,
     featured: true,
-    terms: PHANTOM_30.price.terms,
+    founding: PHANTOM_30_FOUNDING,
+    terms: FOUNDING_CLOSED
+      ? PHANTOM_30_FOUNDING.closedCopy
+      : PHANTOM_30.price.terms,
+    ladderNote: FOUNDING_CLOSED
+      ? PHANTOM_30_FOUNDING.closedCopy
+      : PHANTOM_30_FOUNDING.principle,
     disclosure: PHANTOM_30.price.disclosure,
   },
-  {
-    ...SCALE_FULL,
-    description: `${SCALE_FULL.description} ${SCALE_FULL.cycleReason}`,
-  },
+  SCALE_FULL,
 ] as const;
 
 export const SCALE_FULL_PREREQUISITES =

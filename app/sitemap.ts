@@ -1,9 +1,9 @@
 import { MetadataRoute } from "next";
 import { RUNTIME_GATES } from "@/config/gates";
-import { absoluteUrl } from "@/config/site";
+import { absoluteUrl, isIndexableEnvironment } from "@/config/site";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  if (!RUNTIME_GATES.publicDomain.approved) {
+  if (!isIndexableEnvironment()) {
     return [];
   }
 

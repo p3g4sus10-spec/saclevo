@@ -8,6 +8,7 @@ import Phantom30 from "@/components/Phantom30";
 import ProductLadder from "@/components/ProductLadder";
 import {
   formatMxn,
+  PHANTOM_30_FOUNDING,
   PHANTOM_30,
   PRICING_POLICY,
   SCALE_BASIC,
@@ -37,8 +38,12 @@ describe("rendered offer and booking contracts", () => {
     expect(html).toContain(SCALE_BASIC.terms);
     expect(html).toContain(PHANTOM_30.price.terms);
     expect(html).toContain(SCALE_FULL.terms);
+    expect(html).toContain(PHANTOM_30_FOUNDING.availabilityLabel);
+    expect(html).toContain(PHANTOM_30_FOUNDING.principle);
     expect(html).toContain(PRICING_POLICY.safeDisclosure);
     expect(html).toContain("¿CUÁNDO TIENE SENTIDO SCALE FULL?");
+    expect(html).not.toContain("advisory");
+    expect(html).not.toContain("El scope");
     expect(html).not.toContain(BOOKING.url);
   });
 
@@ -46,7 +51,11 @@ describe("rendered offer and booking contracts", () => {
     const html = renderToStaticMarkup(<Phantom30 />);
 
     expect(html).toContain("4 VIDEOS TERMINADOS");
-    expect(html).toContain("Edición y entrega final");
+    expect(html).toContain("Concepto, hook y guion/estructura");
+    expect(html).toContain("Color/acabado, export y entrega final");
+    expect(html).toContain(PHANTOM_30_FOUNDING.statusLabel);
+    expect(html).toContain(PHANTOM_30_FOUNDING.principle);
+    expect(html).toContain(PHANTOM_30_FOUNDING.futureRateCopy);
     expect(html).toContain(formatMxn(PHANTOM_30.price.base));
     expect(html).toContain(formatMxn(PHANTOM_30.price.firstInstallment));
     expect(html).toContain("INCLUIDA EN LOS $9,000");
@@ -134,7 +143,22 @@ describe("home composition and resilience", () => {
     expect(css).toMatch(/\.hero-content\s*\{[\s\S]*?opacity:\s*1;/);
 
     const principles = source("components/Principles.tsx");
-    expect(principles).toContain("gsap.set(words, { opacity: 1, x: 0 })");
+    expect(principles).toContain(
+      "gsap.set(words, { opacity: 1, x: 0, y: 0 })",
+    );
+    expect(principles).not.toContain("pin: true");
+    expect(principles).not.toContain("scrub:");
+    expect(principles).not.toContain('end: "+=250%"');
+  });
+
+  it("keeps discovery files and the floating CTA fail-closed by default", () => {
+    expect(source("app/sitemap.ts")).toContain("isIndexableEnvironment()");
+    expect(source("next.config.ts")).toContain(
+      '{ key: "X-Robots-Tag", value: "noindex, nofollow" }',
+    );
+    const home = source("components/HomeExperience.tsx");
+    expect(home).toContain("IntersectionObserver");
+    expect(home).toContain('aria-hidden={!showFloatingCta}');
   });
 
   it("isolates WebGL initialization and render failures", () => {
@@ -191,7 +215,9 @@ describe("repository copy guardrails", () => {
       /cuatro\s+arquitecturas/i,
       /\b4\s+arquitecturas/i,
       /\b4\s+piezas\b/i,
+      /cuatro\s+piezas/i,
       /\$\s*19[.,]900/,
+      /\$\s*24[.,]900/,
       /\$\s*59[.,]000/,
       /\$\s*12[.,]000/,
       /\$\s*9[.,]000\s+MXN\s+en\s+total/i,
@@ -201,6 +227,9 @@ describe("repository copy guardrails", () => {
       /recuper(?:as|a|ará)\s+la\s+inversión/i,
       /últimos\s+lugares|cupo\s+limitado|countdown/i,
       /45\s*(?:min|minutos)/i,
+      /(?:ROI|ventas|leads|viralidad)\s+garantizad[oa]s?/i,
+      /casos\s+de\s+éxito\s+garantizados/i,
+      /\bdescuento\b/i,
     ];
 
     for (const pattern of forbiddenPatterns) {
