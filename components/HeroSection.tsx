@@ -269,17 +269,17 @@ export default function HeroSection() {
 
         <h1 className="hero-h1">
           <span className="line-mask">
-            <span className="line-inner">TU NEGOCIO PUEDE SER MEJOR</span>
+            <span className="line-inner">TU NEGOCIO YA PUEDE SER MEJOR.</span>
           </span>
           <span className="line-mask">
-            <span className="line-inner">DE LO QUE PARECE ONLINE.</span>
+            <span className="line-inner">ONLINE TODAVÍA NO LO PARECE.</span>
           </span>
         </h1>
 
         <p className="hero-subtitle">
-          Cuando lo que la gente ve no refleja lo que realmente entregas,
-          puedes perder oportunidades antes de que exista una conversación.
-          Te ayudamos a cerrar esa brecha.
+          Cuando percepción y realidad no coinciden, las oportunidades se
+          enfrían antes de empezar. En Scalevo alineamos percepción, contenido
+          y conversión para cerrar esa brecha.
         </p>
 
         <div className="hero-cta-group">

@@ -25,13 +25,18 @@ export function startHeroParticles({
   buildLogo,
 }: HeroParticleOptions): () => void {
   let renderer: THREE.WebGLRenderer;
+  const getSectionSize = () => ({
+    width: Math.max(section.clientWidth, 1),
+    height: Math.max(section.clientHeight, 1),
+  });
+  const initialSize = getSectionSize();
 
   try {
     renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
     renderer.setPixelRatio(
       Math.min(window.devicePixelRatio, tier === "elite" ? 2 : 1.5),
     );
-    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setSize(initialSize.width, initialSize.height, false);
     renderer.setClearColor(0x0a0a0a, 1);
   } catch {
     canvas.hidden = true;
@@ -41,7 +46,7 @@ export function startHeroParticles({
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(
     75,
-    window.innerWidth / window.innerHeight,
+    initialSize.width / initialSize.height,
     0.1,
     1000,
   );
@@ -222,11 +227,14 @@ export function startHeroParticles({
   });
 
   const onResize = () => {
-    camera.aspect = window.innerWidth / window.innerHeight;
+    const { width, height } = getSectionSize();
+    camera.aspect = width / height;
     camera.updateProjectionMatrix();
-    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setSize(width, height, false);
   };
   window.addEventListener("resize", onResize);
+  const resizeObserver = new ResizeObserver(onResize);
+  resizeObserver.observe(section);
 
   return () => {
     cancelled = true;
@@ -235,6 +243,7 @@ export function startHeroParticles({
     window.removeEventListener("mousemove", onMouseMove);
     document.removeEventListener("visibilitychange", handleVisibility);
     window.removeEventListener("resize", onResize);
+    resizeObserver.disconnect();
     visibilityObserver.disconnect();
     scrollTrigger.kill();
     renderer.dispose();

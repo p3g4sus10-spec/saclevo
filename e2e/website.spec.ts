@@ -80,6 +80,57 @@ test("supports mobile navigation without horizontal overflow", async ({ page }) 
   expect(layout.overflow, JSON.stringify(layout.offenders)).toBeLessThanOrEqual(1);
 });
 
+test("keeps the mobile hero concise and readable at 320px and 390px", async ({
+  page,
+}) => {
+  for (const viewport of [
+    { width: 320, height: 800 },
+    { width: 390, height: 844 },
+  ]) {
+    await page.setViewportSize(viewport);
+    await page.goto("/");
+
+    await expect(page.getByRole("heading", { level: 1 })).toHaveText(
+      /TU NEGOCIO YA PUEDE SER MEJOR\.\s*ONLINE TODAVÍA NO LO PARECE\./,
+    );
+
+    const heroLayout = await page.evaluate(() => {
+      const hero = document.querySelector<HTMLElement>(".hero-section");
+      const headline = document.querySelector<HTMLElement>(".hero-h1");
+      const cta = document.querySelector<HTMLElement>("#hero-cta-primary");
+      const lines = [
+        ...document.querySelectorAll<HTMLElement>(".hero-h1 .line-inner"),
+      ]
+        .map((line) => {
+          const range = document.createRange();
+          range.selectNodeContents(line);
+          return range.getClientRects().length;
+        })
+        .reduce((total, count) => total + count, 0);
+
+      return {
+        heroHeight: hero?.getBoundingClientRect().height ?? 0,
+        headlineLines: lines,
+        headlineFontSize: Number.parseFloat(
+          headline ? getComputedStyle(headline).fontSize : "0",
+        ),
+        ctaHeight: cta?.getBoundingClientRect().height ?? 0,
+        overflow:
+          document.documentElement.scrollWidth -
+          document.documentElement.clientWidth,
+      };
+    });
+
+    const context = `${viewport.width}px hero layout`;
+    expect(heroLayout.heroHeight, context).toBeLessThanOrEqual(781);
+    expect(heroLayout.headlineLines, context).toBeLessThanOrEqual(4);
+    expect(heroLayout.headlineFontSize, context).toBeLessThanOrEqual(40);
+    expect(heroLayout.ctaHeight, context).toBeGreaterThanOrEqual(44);
+    expect(heroLayout.ctaHeight, context).toBeLessThanOrEqual(60);
+    expect(heroLayout.overflow, context).toBeLessThanOrEqual(1);
+  }
+});
+
 test("opens FAQ controls with native keyboard activation", async ({ page }) => {
   await page.goto("/");
   const question = page.getByRole("button", { name: "¿Qué es PHANTOM 30?" });
