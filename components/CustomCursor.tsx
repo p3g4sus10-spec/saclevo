@@ -29,21 +29,35 @@ export default function CustomCursor() {
     let mouseY = 0;
     let ringX = 0;
     let ringY = 0;
-    let animId: number;
+    let animId: number | null = null;
+
+    const loop = () => {
+      const deltaX = mouseX - ringX;
+      const deltaY = mouseY - ringY;
+      ringX += deltaX * 0.12;
+      ringY += deltaY * 0.12;
+      ring.style.left = `${ringX}px`;
+      ring.style.top = `${ringY}px`;
+
+      if (Math.abs(deltaX) > 0.1 || Math.abs(deltaY) > 0.1) {
+        animId = requestAnimationFrame(loop);
+      } else {
+        ringX = mouseX;
+        ringY = mouseY;
+        animId = null;
+      }
+    };
+
+    const requestCursorFrame = () => {
+      if (animId === null) animId = requestAnimationFrame(loop);
+    };
 
     const onMove = (e: MouseEvent) => {
       mouseX = e.clientX;
       mouseY = e.clientY;
       dot.style.left = `${mouseX}px`;
       dot.style.top = `${mouseY}px`;
-    };
-
-    const loop = () => {
-      ringX += (mouseX - ringX) * 0.12;
-      ringY += (mouseY - ringY) * 0.12;
-      ring.style.left = `${ringX}px`;
-      ring.style.top = `${ringY}px`;
-      animId = requestAnimationFrame(loop);
+      requestCursorFrame();
     };
 
     const onEnter = () => ring.classList.add("hovering");
@@ -57,15 +71,13 @@ export default function CustomCursor() {
       el.addEventListener("mouseleave", onLeave);
     });
 
-    animId = requestAnimationFrame(loop);
-
     return () => {
       document.removeEventListener("mousemove", onMove);
       interactives.forEach((el) => {
         el.removeEventListener("mouseenter", onEnter);
         el.removeEventListener("mouseleave", onLeave);
       });
-      cancelAnimationFrame(animId);
+      if (animId !== null) cancelAnimationFrame(animId);
       document.body.classList.remove("custom-cursor-enabled");
     };
   }, []);

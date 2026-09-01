@@ -1,6 +1,8 @@
 "use client";
 
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
+import { gsap } from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { CTA_LABELS } from "@/config/site";
 import {
   CLAIMS_DISCLOSURE,
@@ -8,11 +10,131 @@ import {
   SCALE_FULL_PREREQUISITES,
 } from "@/config/offers";
 import { useSectionView } from "@/lib/useSectionView";
+import { getMotionTier } from "@/lib/motion";
 import BookingLink from "@/components/BookingLink";
+
+gsap.registerPlugin(ScrollTrigger);
 
 export default function ProductLadder() {
   const sectionRef = useRef<HTMLElement>(null);
   useSectionView(sectionRef, "product_ladder");
+
+  useEffect(() => {
+    const tier = getMotionTier();
+
+    const ctx = gsap.context(() => {
+      if (tier === "reduced") return;
+
+      gsap.fromTo(
+        ".product-ladder-header .section-label",
+        { opacity: 0, y: 8 },
+        {
+          opacity: 1,
+          y: 0,
+          duration: 0.45,
+          ease: "power2.out",
+          scrollTrigger: {
+            trigger: ".product-ladder-header",
+            start: "top 86%",
+            once: true,
+          },
+        },
+      );
+
+      gsap.fromTo(
+        ".product-ladder-header .section-title, .product-ladder-intro",
+        { opacity: 0, y: 14 },
+        {
+          opacity: 1,
+          y: 0,
+          duration: 0.55,
+          stagger: 0.06,
+          ease: "power3.out",
+          scrollTrigger: {
+            trigger: ".product-ladder-header",
+            start: "top 84%",
+            once: true,
+          },
+        },
+      );
+
+      gsap.fromTo(
+        ".product-ladder-list",
+        { "--ladder-progress": 0 },
+        {
+          "--ladder-progress": 1,
+          duration: 0.65,
+          ease: "power2.out",
+          scrollTrigger: {
+            trigger: ".product-ladder-list",
+            start: "top 84%",
+            once: true,
+          },
+        },
+      );
+
+      const routes = gsap.utils.toArray<HTMLElement>(".product-route");
+      routes.forEach((route) => {
+        const routeTimeline = gsap.timeline({
+          scrollTrigger: {
+            trigger: route,
+            start: "top 88%",
+            once: true,
+          },
+        });
+
+        routeTimeline.fromTo(
+          route,
+          { opacity: 0, y: 16 },
+          {
+            opacity: 1,
+            y: 0,
+            duration: 0.6,
+            ease: "power3.out",
+          },
+        );
+
+        const node = route.querySelector<HTMLElement>(".product-route-node");
+        if (node) {
+          routeTimeline.fromTo(
+            node,
+            { opacity: 0.6, filter: "brightness(0.75)" },
+            {
+              opacity: 1,
+              filter: "brightness(1)",
+              duration: 0.5,
+              ease: "power2.out",
+            },
+            "<",
+          );
+        }
+
+        const foundingBadge = route.querySelector<HTMLElement>(
+          ".product-route-founding",
+        );
+        if (foundingBadge) {
+          routeTimeline.fromTo(
+            foundingBadge,
+            {
+              opacity: 0,
+              y: 8,
+              boxShadow: "0 0 0 rgba(116, 135, 255, 0)",
+            },
+            {
+              opacity: 1,
+              y: 0,
+              boxShadow: "0 0 18px rgba(116, 135, 255, 0.12)",
+              duration: 0.5,
+              ease: "power2.out",
+            },
+            "<0.12",
+          );
+        }
+      });
+    }, sectionRef);
+
+    return () => ctx.revert();
+  }, []);
 
   return (
     <section

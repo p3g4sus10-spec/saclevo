@@ -239,6 +239,113 @@ test("adapts density across tablet, laptop and cinematic desktop", async ({
   }
 });
 
+test("restores the three-phrase lateral narrative without clipping or pinning", async ({
+  page,
+}) => {
+  test.setTimeout(180_000);
+
+  for (const viewport of [
+    { width: 320, height: 800 },
+    { width: 390, height: 844 },
+    { width: 430, height: 900 },
+    { width: 768, height: 1024 },
+    { width: 1280, height: 650 },
+    { width: 1280, height: 720 },
+    { width: 1366, height: 768 },
+    { width: 1440, height: 900 },
+    { width: 1920, height: 1080 },
+  ]) {
+    await page.setViewportSize(viewport);
+    await page.goto("/");
+
+    const kinetic = page.locator(".kinetic-section");
+    await kinetic.scrollIntoViewIfNeeded();
+    await page.waitForTimeout(900);
+
+    const layout = await page.evaluate(() => ({
+      overflow:
+        document.documentElement.scrollWidth -
+        document.documentElement.clientWidth,
+      pinSpacers: document.querySelectorAll(".pin-spacer").length,
+      words: [
+        ...document.querySelectorAll<HTMLElement>(".kinetic-word"),
+      ].map((word) => {
+        const rect = word.getBoundingClientRect();
+        const style = getComputedStyle(word);
+        return {
+          text: word.textContent?.trim(),
+          left: rect.left,
+          right: rect.right,
+          opacity: Number.parseFloat(style.opacity),
+        };
+      }),
+    }));
+
+    const context = `${viewport.width}x${viewport.height}`;
+    expect(layout.pinSpacers, context).toBe(0);
+    expect(layout.overflow, context).toBeLessThanOrEqual(1);
+    expect(layout.words.map(({ text }) => text), context).toEqual([
+      "NO HACEMOS CONTENIDO POR HACERLO.",
+      "CADA PIEZA TIENE UN PROPÓSITO.",
+      "NO ES SUERTE. ES SISTEMA.",
+    ]);
+    for (const word of layout.words) {
+      expect(word.opacity, `${context}: ${word.text}`).toBeGreaterThanOrEqual(
+        0.99,
+      );
+      expect(word.left, `${context}: ${word.text}`).toBeGreaterThanOrEqual(-1);
+      expect(word.right, `${context}: ${word.text}`).toBeLessThanOrEqual(
+        viewport.width + 1,
+      );
+    }
+  }
+});
+
+test("settles selected micro-motion into a readable final state", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1280, height: 720 });
+  await page.goto("/");
+
+  await page.locator("#perception-gap").scrollIntoViewIfNeeded();
+  await page.waitForTimeout(700);
+  await expect(page.locator(".pg-col")).toHaveCount(2);
+
+  await page.locator("#phantom-system").scrollIntoViewIfNeeded();
+  await page.waitForTimeout(700);
+  expect(
+    await page.locator(".phantom-stage-id").evaluateAll((ids) =>
+      ids.every((id) => Number.parseFloat(getComputedStyle(id).opacity) >= 0.99),
+    ),
+  ).toBe(true);
+
+  await page.locator(".product-ladder-list").scrollIntoViewIfNeeded();
+  await page.waitForTimeout(750);
+  expect(
+    await page.locator(".product-ladder-list").evaluate((list) =>
+      Number.parseFloat(
+        getComputedStyle(list).getPropertyValue("--ladder-progress"),
+      ),
+    ),
+  ).toBeGreaterThanOrEqual(0.99);
+
+  await page.locator(".p30-founding-card").scrollIntoViewIfNeeded();
+  await page.waitForTimeout(700);
+  expect(
+    await page.locator(".p30-founding-status").evaluate((status) =>
+      Number.parseFloat(getComputedStyle(status).opacity),
+    ),
+  ).toBeGreaterThanOrEqual(0.99);
+
+  expect(
+    await page.evaluate(
+      () =>
+        document.documentElement.scrollWidth -
+        document.documentElement.clientWidth,
+    ),
+  ).toBeLessThanOrEqual(1);
+});
+
 test("shows the canonical four-slot Founding state without fake urgency", async ({
   page,
 }) => {
@@ -288,6 +395,39 @@ test("keeps essential hero guidance visible with reduced motion", async ({
       height: (canvas as HTMLCanvasElement).height,
     })),
   ).toEqual({ width: 300, height: 150 });
+
+  const reducedStates = await page.evaluate(() => {
+    const selectors = [
+      ".kinetic-word",
+      ".section-label",
+      ".phantom-stage",
+      ".product-route",
+      ".p30-founding-card",
+    ];
+    return {
+      elements: selectors.flatMap((selector) =>
+        [...document.querySelectorAll<HTMLElement>(selector)].map((element) => {
+          const style = getComputedStyle(element);
+          return {
+            selector,
+            opacity: Number.parseFloat(style.opacity),
+            transform: style.transform,
+          };
+        }),
+      ),
+      ladderProgress: Number.parseFloat(
+        getComputedStyle(
+          document.querySelector<HTMLElement>(".product-ladder-list")!,
+        ).getPropertyValue("--ladder-progress"),
+      ),
+    };
+  });
+
+  expect(reducedStates.ladderProgress).toBe(1);
+  for (const state of reducedStates.elements) {
+    expect(state.opacity, state.selector).toBeGreaterThanOrEqual(0.99);
+    expect(state.transform, state.selector).toBe("none");
+  }
 });
 
 test("fails closed for privacy and renders the custom 404", async ({ page }) => {

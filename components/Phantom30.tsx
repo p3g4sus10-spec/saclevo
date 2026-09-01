@@ -23,14 +23,20 @@ export default function Phantom30() {
   });
 
   useEffect(() => {
+    const tier = getMotionTier();
+
     const ctx = gsap.context(() => {
-      if (getMotionTier() === 'reduced') return;
+      if (tier === "reduced") return;
       gsap.fromTo(
         ".p30-header",
         { opacity: 0, y: 20 },
         {
           opacity: 1, y: 0, duration: 0.65, ease: "power3.out",
-          scrollTrigger: { trigger: ".p30-header", start: "top 82%" },
+          scrollTrigger: {
+            trigger: ".p30-header",
+            start: "top 82%",
+            once: true,
+          },
         }
       );
 
@@ -39,7 +45,11 @@ export default function Phantom30() {
         { opacity: 0, x: -18 },
         {
           opacity: 1, x: 0, duration: 0.55, stagger: 0.08, ease: "power3.out",
-          scrollTrigger: { trigger: ".p30-timeline", start: "top 80%" },
+          scrollTrigger: {
+            trigger: ".p30-timeline",
+            start: "top 80%",
+            once: true,
+          },
         }
       );
 
@@ -48,17 +58,76 @@ export default function Phantom30() {
         { opacity: 0, y: 18 },
         {
           opacity: 1, y: 0, duration: 0.55, stagger: 0.07, ease: "power3.out",
-          scrollTrigger: { trigger: ".p30-deliverables", start: "top 82%" },
+          scrollTrigger: {
+            trigger: ".p30-deliverables",
+            start: "top 82%",
+            once: true,
+          },
         }
       );
 
-      gsap.fromTo(
-        ".p30-founding-card, .p30-pricing",
+      const foundingTimeline = gsap.timeline({
+        scrollTrigger: {
+          trigger: ".p30-founding-card",
+          start: "top 85%",
+          once: true,
+        },
+      });
+      foundingTimeline.fromTo(
+        ".p30-founding-card",
         { opacity: 0, y: 18 },
         {
-          opacity: 1, y: 0, duration: 0.6, stagger: 0.1, ease: "power3.out",
-          scrollTrigger: { trigger: ".p30-founding-card", start: "top 85%" },
-        }
+          opacity: 1,
+          y: 0,
+          duration: 0.6,
+          ease: "power3.out",
+        },
+      );
+
+      foundingTimeline.fromTo(
+        ".p30-founding-status",
+        {
+          opacity: 0,
+          y: 8,
+          textShadow: "0 0 0 rgba(116, 135, 255, 0)",
+        },
+        {
+          opacity: 1,
+          y: 0,
+          textShadow: "0 0 14px rgba(116, 135, 255, 0.24)",
+          duration: 0.45,
+          ease: "power2.out",
+        },
+        "<0.1",
+      );
+
+      const pricingTimeline = gsap.timeline({
+        scrollTrigger: {
+          trigger: ".p30-pricing",
+          start: "top 88%",
+          once: true,
+        },
+      });
+      pricingTimeline.fromTo(
+        ".p30-pricing",
+        { opacity: 0, y: 18 },
+        {
+          opacity: 1,
+          y: 0,
+          duration: 0.6,
+          ease: "power3.out",
+        },
+      );
+
+      pricingTimeline.fromTo(
+        ".p30-price-divider",
+        { scaleY: 0, transformOrigin: "center top" },
+        {
+          scaleY: 1,
+          duration: 0.5,
+          ease: "power2.out",
+        },
+        "<0.08",
       );
 
       gsap.fromTo(
@@ -69,7 +138,11 @@ export default function Phantom30() {
           scale: 1,
           duration: 0.7,
           ease: "power2.out",
-          scrollTrigger: { trigger: sectionRef.current, start: "top 75%" },
+          scrollTrigger: {
+            trigger: sectionRef.current,
+            start: "top 75%",
+            once: true,
+          },
         },
       );
     }, sectionRef);

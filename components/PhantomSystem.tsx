@@ -15,41 +15,54 @@ export default function PhantomSystem() {
 
   useEffect(() => {
     const tier = getMotionTier();
-    const isMobile = window.innerWidth < 768;
 
     const ctx = gsap.context(() => {
-      if (getMotionTier() === 'reduced') return;
+      if (tier === "reduced") return;
       // Header
       gsap.fromTo(
         ".phantom-system-header",
         { opacity: 0, y: 18 },
         {
           opacity: 1, y: 0, duration: 0.65, ease: "power3.out",
-          scrollTrigger: { trigger: ".phantom-system-header", start: "top 82%" },
+          scrollTrigger: {
+            trigger: ".phantom-system-header",
+            start: "top 82%",
+            once: true,
+          },
         }
       );
 
       // Stage cards stagger
-      gsap.fromTo(
+      const stagesTimeline = gsap.timeline({
+        scrollTrigger: {
+          trigger: ".phantom-stages",
+          start: "top 80%",
+          once: true,
+        },
+      });
+      stagesTimeline.fromTo(
         ".phantom-stage",
         { opacity: 0, y: 20 },
         {
           opacity: 1, y: 0, duration: 0.6, stagger: 0.08, ease: "power3.out",
-          scrollTrigger: { trigger: ".phantom-stages", start: "top 80%" },
         }
       );
 
-      // Connector lines (desktop only)
-      if (!isMobile && tier !== "lite" && tier !== "reduced") {
-        gsap.fromTo(
-          ".phantom-connector",
-          { scaleX: 0 },
-          {
-            scaleX: 1, duration: 1, ease: "power2.inOut",
-            scrollTrigger: { trigger: ".phantom-stages", start: "top 75%" },
-          }
-        );
-      }
+      stagesTimeline.fromTo(
+        ".phantom-stage-id",
+        {
+          opacity: 0.45,
+          textShadow: "0 0 0 rgba(116, 135, 255, 0)",
+        },
+        {
+          opacity: 1,
+          textShadow: "0 0 14px rgba(116, 135, 255, 0.3)",
+          duration: 0.45,
+          stagger: 0.08,
+          ease: "power2.out",
+        },
+        "<",
+      );
     }, sectionRef);
 
     return () => ctx.revert();

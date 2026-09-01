@@ -151,6 +151,57 @@ describe("home composition and resilience", () => {
     expect(principles).not.toContain('end: "+=250%"');
   });
 
+  it("keeps micro-motion lateral, bounded, one-shot and loop-free", () => {
+    const principles = source("components/Principles.tsx");
+    const perception = source("components/PerceptionGap.tsx");
+    const phantomSystem = source("components/PhantomSystem.tsx");
+    const productLadder = source("components/ProductLadder.tsx");
+    const phantom30 = source("components/Phantom30.tsx");
+    const cursor = source("components/CustomCursor.tsx");
+    const motionSource = [
+      principles,
+      perception,
+      phantomSystem,
+      productLadder,
+      phantom30,
+    ].join("\n");
+    const css = source("app/globals.css");
+
+    expect(principles).toContain("NO HACEMOS CONTENIDO POR HACERLO.");
+    expect(principles).toContain("CADA PIEZA TIENE UN PROPÓSITO.");
+    expect(principles).toContain("NO ES SUERTE. ES SISTEMA.");
+    expect(principles).toContain("index === 1 ? 1 : -1");
+    expect(principles).toContain("if (window.innerWidth <= 480) return 28");
+    expect(principles).toContain("if (window.innerWidth < 1440) return 48");
+    expect(principles).toContain("return 64");
+    expect(principles).toContain("duration: 0.7");
+    expect(principles).toContain('ease: "power3.out"');
+    expect(principles).toContain("once: true");
+    expect(principles).toContain(
+      'textShadow: "0 0 28px rgba(26, 26, 255, 0.28)"',
+    );
+
+    expect(perception).toContain("scaleY: isMobile ? 1 : 0");
+    expect(phantomSystem).toContain('".phantom-stage-id"');
+    expect(productLadder).toContain('"--ladder-progress": 1');
+    expect(productLadder).toContain('".product-route-founding"');
+    expect(phantom30).toContain('".p30-founding-status"');
+    expect(phantom30).toContain('".p30-price-divider"');
+    expect(cursor).toContain("const requestCursorFrame");
+    expect(cursor).toContain("if (animId === null)");
+    expect(cursor).toContain("animId = null");
+
+    expect(motionSource).not.toMatch(/pin\s*:\s*true/);
+    expect(motionSource).not.toMatch(/scrub\s*:/);
+    expect(motionSource).not.toMatch(/repeat\s*:\s*-1/);
+    expect(motionSource).not.toMatch(/yoyo\s*:/);
+    expect(motionSource).not.toContain("requestAnimationFrame");
+    expect(motionSource).not.toMatch(/addEventListener\(["']scroll/);
+    expect(css).not.toMatch(/animation\s*:[^;]*infinite/i);
+    expect(css).toMatch(/\.btn-neon:active[\s\S]*?scale:\s*0\.985/);
+    expect(css).toMatch(/\.faq-item-open \.faq-icon[^{]*\{[^}]*rotate\(45deg\)/);
+  });
+
   it("keeps discovery files and the floating CTA fail-closed by default", () => {
     expect(source("app/sitemap.ts")).toContain("isIndexableEnvironment()");
     expect(source("next.config.ts")).toContain(

@@ -1,8 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { gsap }
-from "gsap";
+import { gsap } from "gsap";
 import { getMotionTier } from "@/lib/motion";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useSectionView } from "@/lib/useSectionView";
@@ -14,15 +13,38 @@ export default function PerceptionGap() {
   useSectionView(sectionRef, "perception_gap");
 
   useEffect(() => {
+    const tier = getMotionTier();
+    const isMobile = window.innerWidth <= 768;
+
     const ctx = gsap.context(() => {
-      if (getMotionTier() === 'reduced') return;
+      if (tier === "reduced") return;
+      gsap.fromTo(
+        ".perception-section .section-label",
+        { opacity: 0, y: 8 },
+        {
+          opacity: 1,
+          y: 0,
+          duration: 0.45,
+          ease: "power2.out",
+          scrollTrigger: {
+            trigger: ".perception-section .section-label",
+            start: "top 88%",
+            once: true,
+          },
+        },
+      );
+
       // Headline entrance
       gsap.fromTo(
         ".pg-headline",
         { opacity: 0, y: 20 },
         {
           opacity: 1, y: 0, duration: 0.65, ease: "power3.out",
-          scrollTrigger: { trigger: ".pg-headline", start: "top 80%" },
+          scrollTrigger: {
+            trigger: ".pg-headline",
+            start: "top 80%",
+            once: true,
+          },
         }
       );
 
@@ -32,18 +54,61 @@ export default function PerceptionGap() {
         { opacity: 0, y: 18 },
         {
           opacity: 1, y: 0, duration: 0.6, stagger: 0.12, ease: "power3.out",
-          scrollTrigger: { trigger: ".pg-columns", start: "top 82%" },
+          scrollTrigger: {
+            trigger: ".pg-columns",
+            start: "top 82%",
+            once: true,
+          },
         }
       );
 
       // Divider line
-      gsap.fromTo(
+      const dividerTimeline = gsap.timeline({
+        scrollTrigger: {
+          trigger: ".pg-vs",
+          start: "top 88%",
+          once: true,
+        },
+      });
+      dividerTimeline.fromTo(
         ".pg-divider-line",
-        { scaleX: 0 },
         {
-          scaleX: 1, duration: 0.7, ease: "power3.inOut",
-          scrollTrigger: { trigger: ".pg-divider-line", start: "top 85%" },
+          scaleX: isMobile ? 0 : 1,
+          scaleY: isMobile ? 1 : 0,
+          transformOrigin: isMobile ? "left center" : "center top",
+        },
+        {
+          scaleX: 1,
+          scaleY: 1,
+          duration: 0.55,
+          stagger: 0.08,
+          ease: "power2.out",
         }
+      );
+      dividerTimeline.fromTo(
+        ".pg-vs-text",
+        { opacity: 0 },
+        {
+          opacity: 1,
+          duration: 0.4,
+          ease: "power2.out",
+        },
+        "<0.08",
+      );
+      gsap.fromTo(
+        ".pg-col-bar-fill",
+        { scaleX: 0, transformOrigin: "left center" },
+        {
+          scaleX: 1,
+          duration: 0.6,
+          stagger: 0.12,
+          ease: "power2.out",
+          scrollTrigger: {
+            trigger: ".pg-columns",
+            start: "top 82%",
+            once: true,
+          },
+        },
       );
 
       // Closing statement
@@ -52,7 +117,11 @@ export default function PerceptionGap() {
         { opacity: 0, y: 16 },
         {
           opacity: 1, y: 0, duration: 0.6, ease: "power3.out",
-          scrollTrigger: { trigger: ".pg-close", start: "top 88%" },
+          scrollTrigger: {
+            trigger: ".pg-close",
+            start: "top 88%",
+            once: true,
+          },
         }
       );
     }, sectionRef);

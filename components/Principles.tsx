@@ -54,24 +54,52 @@ export default function Principles() {
         return;
       }
 
-      gsap.fromTo(
-        words,
-        { opacity: 0, y: 20 },
-        {
-          opacity: 1,
-          y: 0,
-          duration: 0.6,
-          stagger: 0.12,
-          ease: "power3.out",
-          scrollTrigger: { trigger: kineticRef.current, start: "top 78%" },
-        },
-      );
+      const lateralDistance = () => {
+        if (window.innerWidth <= 480) return 28;
+        if (window.innerWidth < 1440) return 48;
+        return 64;
+      };
+
+      words.forEach((word, index) => {
+        const direction = index === 1 ? 1 : -1;
+        const isClosingPhrase = word.classList.contains("filled");
+
+        gsap.fromTo(
+          word,
+          {
+            opacity: 0,
+            x: () => direction * lateralDistance(),
+            ...(isClosingPhrase
+              ? { textShadow: "0 0 0 rgba(26, 26, 255, 0)" }
+              : {}),
+          },
+          {
+            opacity: 1,
+            x: 0,
+            duration: 0.7,
+            ease: "power3.out",
+            ...(isClosingPhrase
+              ? { textShadow: "0 0 28px rgba(26, 26, 255, 0.28)" }
+              : {}),
+            scrollTrigger: {
+              trigger: word,
+              start: "top 90%",
+              once: true,
+              invalidateOnRefresh: true,
+            },
+          },
+        );
+      });
     }, kineticRef);
 
     // Manifesto pillars
     const pillarsCtx = gsap.context(() => {
       if (tier === "reduced") {
-        gsap.set([".principle-pillar", ".principles-big-text"], {
+        gsap.set([
+          ".principles-section .section-label",
+          ".principle-pillar",
+          ".principles-big-text",
+        ], {
           opacity: 1,
           x: 0,
           y: 0,
@@ -79,11 +107,30 @@ export default function Principles() {
         return;
       }
       gsap.fromTo(
+        ".principles-section .section-label",
+        { opacity: 0, y: 8 },
+        {
+          opacity: 1,
+          y: 0,
+          duration: 0.45,
+          ease: "power2.out",
+          scrollTrigger: {
+            trigger: ".principles-section .section-label",
+            start: "top 88%",
+            once: true,
+          },
+        },
+      );
+      gsap.fromTo(
         ".principle-pillar",
         { opacity: 0, x: 18 },
         {
           opacity: 1, x: 0, duration: 0.7, stagger: 0.1, ease: "power3.out",
-          scrollTrigger: { trigger: ".principles-grid", start: "top 82%" },
+          scrollTrigger: {
+            trigger: ".principles-grid",
+            start: "top 82%",
+            once: true,
+          },
         }
       );
       gsap.fromTo(
@@ -91,7 +138,11 @@ export default function Principles() {
         { opacity: 0, y: 20 },
         {
           opacity: 1, y: 0, duration: 0.65, ease: "power3.out",
-          scrollTrigger: { trigger: ".principles-big-text", start: "top 85%" },
+          scrollTrigger: {
+            trigger: ".principles-big-text",
+            start: "top 85%",
+            once: true,
+          },
         }
       );
     }, sectionRef);

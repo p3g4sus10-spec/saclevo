@@ -1,8 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { gsap }
-from "gsap";
+import { gsap } from "gsap";
 import { getMotionTier } from "@/lib/motion";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { FAQ_ITEMS } from "@/config/faq";
@@ -17,14 +16,20 @@ export default function FAQ() {
   useSectionView(sectionRef, "faq");
 
   useEffect(() => {
+    const tier = getMotionTier();
+
     const ctx = gsap.context(() => {
-      if (getMotionTier() === 'reduced') return;
+      if (tier === "reduced") return;
       gsap.fromTo(
         ".faq-header",
         { opacity: 0, y: 18 },
         {
           opacity: 1, y: 0, duration: 0.6, ease: "power3.out",
-          scrollTrigger: { trigger: ".faq-header", start: "top 82%" },
+          scrollTrigger: {
+            trigger: ".faq-header",
+            start: "top 82%",
+            once: true,
+          },
         }
       );
       gsap.fromTo(
@@ -32,7 +37,11 @@ export default function FAQ() {
         { opacity: 0, y: 12 },
         {
           opacity: 1, y: 0, duration: 0.5, stagger: 0.06, ease: "power3.out",
-          scrollTrigger: { trigger: ".faq-list", start: "top 82%" },
+          scrollTrigger: {
+            trigger: ".faq-list",
+            start: "top 82%",
+            once: true,
+          },
         }
       );
     }, sectionRef);
@@ -83,7 +92,7 @@ export default function FAQ() {
                   >
                     <span>{item.q}</span>
                     <span className="faq-icon" aria-hidden="true">
-                      {isOpen ? "−" : "+"}
+                      +
                     </span>
                   </button>
                 </dt>

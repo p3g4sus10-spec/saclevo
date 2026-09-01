@@ -500,17 +500,11 @@ h1, h2, h3, h4, h5, h6 {
   border-right: 1px solid var(--text-subtle);
   border-bottom: 1px solid var(--text-subtle);
   transform: rotate(45deg);
-  animation: chevronFall 0.7s ease-in-out infinite;
+  opacity: 0.75;
 }
 
-.scroll-chevrons span:nth-child(2) { animation-delay: 0.12s; opacity: 0.6; }
-.scroll-chevrons span:nth-child(3) { animation-delay: 0.24s; opacity: 0.3; }
-
-@keyframes chevronFall {
-  0%   { opacity: 0; transform: rotate(45deg) translate(-4px, -4px); }
-  60%  { opacity: 1; }
-  100% { opacity: 0; transform: rotate(45deg) translate(4px, 4px); }
-}
+.scroll-chevrons span:nth-child(2) { opacity: 0.5; }
+.scroll-chevrons span:nth-child(3) { opacity: 0.25; }
 
 /* ============================================
    CTA BUTTON FLOATING
@@ -541,7 +535,8 @@ h1, h2, h3, h4, h5, h6 {
   transition:
     background 0.25s ease,
     box-shadow 0.3s ease,
-    transform 0.2s ease;
+    transform 0.2s ease,
+    scale 0.16s ease;
   box-shadow:
     0 0 20px var(--neon-blue-glow),
     0 4px 24px rgba(21, 102, 255, 0.35);
@@ -572,7 +567,6 @@ h1, h2, h3, h4, h5, h6 {
   height: 6px;
   border-radius: 50%;
   background: rgba(255,255,255,0.75);
-  animation: dotPulse 1.4s ease-in-out infinite;
   flex-shrink: 0;
 }
 
@@ -589,6 +583,7 @@ h1, h2, h3, h4, h5, h6 {
 .btn-neon-sm {
   padding: 10px 20px;
   font-size: 10px;
+  transition: box-shadow 0.3s ease, transform 0.2s ease, scale 0.16s ease;
   box-shadow:
     0 0 14px var(--neon-blue-glow),
     0 2px 16px rgba(21, 102, 255, 0.3);
@@ -614,7 +609,7 @@ h1, h2, h3, h4, h5, h6 {
   text-decoration: none;
   padding: 16px 0;
   border-bottom: 1px solid rgba(255,255,255,0.1);
-  transition: color 0.2s ease, border-color 0.2s ease;
+  transition: color 0.2s ease, border-color 0.2s ease, scale 0.16s ease;
   background: none;
   cursor: pointer;
 }
@@ -622,11 +617,6 @@ h1, h2, h3, h4, h5, h6 {
 .btn-ghost:hover {
   color: var(--text-pure);
   border-color: rgba(255,255,255,0.35);
-}
-
-@keyframes dotPulse {
-  0%, 100% { transform: scale(1);   opacity: 0.75; }
-  50%       { transform: scale(1.5); opacity: 1; }
 }
 
 /* ============================================
@@ -662,7 +652,8 @@ h1, h2, h3, h4, h5, h6 {
     opacity 0.3s ease,
     visibility 0.3s ease,
     box-shadow 0.3s ease,
-    transform 0.3s ease;
+    transform 0.3s ease,
+    scale 0.16s ease;
 }
 
 .cta-float.is-visible {
@@ -677,6 +668,17 @@ h1, h2, h3, h4, h5, h6 {
     0 0 40px var(--neon-blue-glow-strong),
     0 8px 36px rgba(21, 102, 255, 0.55);
   transform: translateY(-2px);
+}
+
+.btn-neon:active,
+.btn-neon-sm:active,
+.calendly-cta-link:active,
+.cta-float:active {
+  scale: 0.985;
+}
+
+.btn-ghost:active {
+  scale: 0.99;
 }
 
 /* ============================================
@@ -719,7 +721,7 @@ h1, h2, h3, h4, h5, h6 {
 .kinetic-word.filled {
   color: var(--brand-blue);
   -webkit-text-stroke: 0px;
-  text-shadow: 0 0 80px rgba(26, 26, 255, 0.5);
+  text-shadow: 0 0 28px rgba(26, 26, 255, 0.28);
 }
 
 .kinetic-center {
@@ -1619,7 +1621,7 @@ h1, h2, h3, h4, h5, h6 {
   padding: max(88px, env(safe-area-inset-top)) 24px
     max(40px, env(safe-area-inset-bottom));
   transform: translateY(-100%);
-  transition: transform 0.5s var(--transition-power);
+  transition: transform 0.38s var(--transition-power);
 }
 
 .mobile-menu.open {
@@ -1639,6 +1641,31 @@ h1, h2, h3, h4, h5, h6 {
 .mobile-nav-link:hover {
   color: var(--brand-blue);
 }
+
+.mobile-menu > .mobile-nav-link,
+.mobile-menu > .mobile-menu-social,
+.mobile-menu > .btn-neon {
+  opacity: 0;
+  transform: translateY(8px);
+  transition:
+    opacity 0.22s ease,
+    transform 0.22s ease,
+    color 0.2s ease;
+}
+
+.mobile-menu.open > .mobile-nav-link,
+.mobile-menu.open > .mobile-menu-social,
+.mobile-menu.open > .btn-neon {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.mobile-menu.open > .mobile-nav-link:nth-of-type(2) { transition-delay: 0.02s; }
+.mobile-menu.open > .mobile-nav-link:nth-of-type(3) { transition-delay: 0.04s; }
+.mobile-menu.open > .mobile-nav-link:nth-of-type(4) { transition-delay: 0.06s; }
+.mobile-menu.open > .mobile-nav-link:nth-of-type(5) { transition-delay: 0.08s; }
+.mobile-menu.open > .mobile-menu-social { transition-delay: 0.08s; }
+.mobile-menu.open > .btn-neon { transition-delay: 0.1s; }
 
 /* ============================================
    CALENDLY SECTION
@@ -1739,7 +1766,11 @@ h1, h2, h3, h4, h5, h6 {
   text-decoration: none;
   position: relative;
   overflow: hidden;
-  transition: background 0.25s ease, box-shadow 0.3s ease, transform 0.2s ease;
+  transition:
+    background 0.25s ease,
+    box-shadow 0.3s ease,
+    transform 0.2s ease,
+    scale 0.16s ease;
   width: fit-content;
   margin-bottom: 20px;
 }
@@ -1769,13 +1800,7 @@ h1, h2, h3, h4, h5, h6 {
   height: 7px;
   border-radius: 50%;
   background: rgba(255,255,255,0.7);
-  animation: dotPulse 1.5s ease-in-out infinite;
   flex-shrink: 0;
-}
-
-@keyframes dotPulse {
-  0%, 100% { transform: scale(1); opacity: 0.7; }
-  50% { transform: scale(1.4); opacity: 1; }
 }
 
 .cta-arrow {
@@ -2398,10 +2423,16 @@ h1, h2, h3, h4, h5, h6 {
 }
 .faq-question:hover { color: var(--brand-blue); }
 .faq-item-open .faq-question { color: var(--brand-blue); }
-.faq-icon { font-size: 20px; color: var(--text-muted); flex-shrink: 0; }
-.faq-item-open .faq-icon { color: var(--brand-blue); }
+.faq-icon { display: inline-block; font-size: 20px; color: var(--text-muted); flex-shrink: 0; transition: transform 0.25s ease, color 0.2s ease; }
+.faq-item-open .faq-icon { color: var(--brand-blue); transform: rotate(45deg); }
 .faq-answer { padding: 0 0 28px; font-size: clamp(14px, 1.5vw, 16px); color: var(--text-muted); line-height: 1.75; }
 .faq-answer[hidden] { display: none; }
+.faq-answer:not([hidden]) { animation: faqAnswerReveal 0.22s ease both; }
+
+@keyframes faqAnswerReveal {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
 
 /* ============================================
    iOS safe area — floating CTA
@@ -2440,6 +2471,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .product-ladder-list {
+  --ladder-progress: 1;
   position: relative;
   display: flex;
   flex-direction: column;
@@ -2464,6 +2496,8 @@ h1, h2, h3, h4, h5, h6 {
     transparent
   );
   box-shadow: 0 0 18px var(--brand-blue-glow);
+  transform: scaleY(var(--ladder-progress));
+  transform-origin: center top;
 }
 
 .product-route {
@@ -3200,14 +3234,42 @@ h1, h2, h3, h4, h5, h6 {
 
 @media (prefers-reduced-motion: reduce) {
   .kinetic-word,
+  .section-label,
+  .pg-col,
+  .pg-divider-line,
+  .pg-col-bar-fill,
+  .phantom-stage,
+  .product-route,
+  .p30-founding-card,
+  .p30-founding-status,
   .principle-pillar,
   .principles-big-text {
     opacity: 1 !important;
     transform: none !important;
   }
 
-  .cta-float {
+  .product-ladder-list {
+    --ladder-progress: 1 !important;
+  }
+
+  .faq-answer:not([hidden]) {
     animation: none;
+  }
+
+  .faq-item-open .faq-icon,
+  .mobile-menu.open > .mobile-nav-link,
+  .mobile-menu.open > .mobile-menu-social,
+  .mobile-menu.open > .btn-neon {
+    transform: none !important;
+    transition-delay: 0s !important;
+  }
+
+  .btn-neon:active,
+  .btn-neon-sm:active,
+  .calendly-cta-link:active,
+  .cta-float:active,
+  .btn-ghost:active {
+    scale: 1 !important;
   }
 }
 
